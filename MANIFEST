@@ -1,0 +1,5 @@
+Makefile.PL
+MANIFEST
+README
+t/Test-A8N.t
+lib/Test/A8N.pm

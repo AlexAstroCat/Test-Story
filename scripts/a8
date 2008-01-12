@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Test::A8N;
+use Getopt::Long;
+use lib qw( t/lib lib );
+
+our $verbose = 0;
+our $help = 0;
+our $fixture_root = 'Fixture';
+our $file_root = 't/cases';
+our @tags = ();
+GetOptions(
+    'verbose'        => \$verbose,
+    'help'           => \$help,
+    'fixture_root=s' => \$fixture_root,
+    'file_root=s'    => \$file_root,
+    'tag=s'          => \@tags,
+);
+@tags = split(/,/, join(',', @tags));
+
+my $a8n = Test::A8N->new({
+    fixture_root => $fixture_root,
+    file_root    => $file_root,
+    filenames    => \@ARGV,
+    tags         => \@tags,
+    verbose      => $verbose,
+});
+$a8n->run_tests();
