@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 17;
 use Test::Exception;
 use lib qw(t/mock t/lib);
 
@@ -14,7 +14,7 @@ BEGIN {
 Basic_usage: {
     ok(Test::A8N::File->meta->has_attribute('filename'), q{filename attribute});
     ok(Test::A8N::File->meta->has_attribute('file_root'), q{file_root attribute});
-    ok(Test::A8N::File->meta->has_attribute('fixture_root'), q{fixture_root attribute});
+    ok(Test::A8N::File->meta->has_attribute('fixture_base'), q{fixture_base attribute});
     ok(Test::A8N::File->meta->has_attribute('fixture_class'), q{fixture attribute});
     ok(Test::A8N::File->meta->has_attribute('data'), q{data attribute});
     ok(Test::A8N::File->meta->has_attribute('cases'), q{cases attribute});
@@ -25,7 +25,7 @@ Basic_usage: {
                 filename     => 't/cases/test_doesnt_exist.tc',
                 file_root    => 't/cases',
                 parser       => 'Test::Sophos::Parser',
-                fixture_root => 'Test::Sophos::Fixture',
+                fixture_base => 'Test::Sophos::Fixture',
             });
         },
         qr{Could not find a8n file "t/cases/test_doesnt_exist.tc"},
@@ -37,7 +37,7 @@ Simple_File: {
     my $file = Test::A8N::File->new({
         filename     => 't/cases/test1.tc',
         file_root    => 't/cases',
-        fixture_root => 'MockFixture',
+        fixture_base => 'MockFixture',
     });
     isa_ok($file, 'Test::A8N::File', q{Created File object for test1.tc});
     is($file->filename, 't/cases/test1.tc', q{Filename property contains valid value});
@@ -57,7 +57,7 @@ Simple_File: {
     };
     is_deeply($file->data, [$test1], q{YAML data returned correctly});
     isa_ok($file->cases->[0], 'Test::A8N::TestCase', q{cases() returned a Test::A8N::TestCase object});
-    is($file->fixture_root, 'MockFixture', q{fixture_root property matches what was supplied});
+    is($file->fixture_base, 'MockFixture', q{fixture_base property matches what was supplied});
     is($file->fixture_class, 'MockFixture', q{Correct fixture class located});
 
     $Test::FITesque::Suite::ADDED_TESTS = [];
@@ -75,5 +75,15 @@ Simple_File: {
         ],
         q{Check that run_tests runs all 4 fixtures}
     );
+}
+
+Inherited_Fixtures: {
+    my $file = Test::A8N::File->new({
+        filename     => 't/cases/UI/Config/Accounts/Alert_Recipients.tc',
+        file_root    => 't/cases',
+        fixture_base => 'Fixture',
+    });
+    isa_ok($file, 'Test::A8N::File', q{Created File object for Alert_Recipients.tc});
+    is($file->fixture_class, 'Fixture::UI::Config', q{Inherited fixture class located});
 }
 

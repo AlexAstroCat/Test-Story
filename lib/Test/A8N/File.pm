@@ -27,7 +27,7 @@ has file_root => (
     isa         => q{Str}
 );
 
-has fixture_root => (
+has fixture_base => (
     is          => q{rw},
     required    => 1,
     isa         => q{Str}
@@ -66,15 +66,15 @@ has fixture_class => (
     default => sub { 
         my $self = shift;
         local @INC = @INC;
-        unless (grep $self->fixture_root, @INC) {
-            unshift @INC, $self->fixture_root;
+        unless (grep $self->fixture_base, @INC) {
+            unshift @INC, $self->fixture_base;
         }
         my $filename = $self->filename;
         my $root = $self->file_root;
-        $filename =~ s#^$root##;
-        my @path = split('/', $self->filename);
+        $filename =~ s#^$root/?##;
+        my @path = split('/', $filename);
         pop @path; # take off the filename
-        unshift @path, $self->fixture_root;
+        unshift @path, $self->fixture_base;
 
         while ($#path > -1) {
             my $class = join('::', @path);

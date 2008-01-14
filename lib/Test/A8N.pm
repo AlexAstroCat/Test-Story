@@ -26,7 +26,7 @@ has file_root => (
     isa         => q{Str}
 );
 
-has fixture_root => (
+has fixture_base => (
     is          => q{rw},
     required    => 1,
     isa         => q{Str}
@@ -63,7 +63,7 @@ has files => (
         for my $filename ( @{ $self->file_paths } ) {
             push @files, Test::A8N::File->new({
                 filename     => $filename,
-                fixture_root => $self->fixture_root,
+                fixture_base => $self->fixture_base,
                 file_root    => $self->file_root,
             });
         }

@@ -13,10 +13,10 @@ Basic_usage: {
     ok( Test::A8N->meta->has_attribute('filenames'), q{filenames attribute}) ;
     ok( Test::A8N->meta->has_attribute('files'), q{files attribute}) ;
     ok( Test::A8N->meta->has_attribute('file_root'), q{file_root attribute}) ;
-    ok( Test::A8N->meta->has_attribute('fixture_root'), q{fixture_root attribute}) ;
+    ok( Test::A8N->meta->has_attribute('fixture_base'), q{fixture_base attribute}) ;
     my $obj = Test::A8N->new({
         filenames => [qw( t/cases/test1.tc )],
-        fixture_root => 'MockFixture',
+        fixture_base => 'MockFixture',
         file_root => 't/cases',
     });
     isa_ok($obj, 'Test::A8N', q{object constructed}) ;
@@ -45,7 +45,7 @@ Basic_usage: {
 Directories: {
     my $obj = Test::A8N->new({
         filenames => [qw( t/cases/UI )],
-        fixture_root => 'MockFixture',
+        fixture_base => 'MockFixture',
         file_root => 't/cases',
     });
     ok(ref $obj->file_paths() eq 'ARRAY', q{file_paths returns array ref});
@@ -63,7 +63,7 @@ Directories: {
 
 Directories_All: {
     my $obj = Test::A8N->new({
-        fixture_root => 'MockFixture',
+        fixture_base => 'MockFixture',
         file_root => 't/cases',
     });
 

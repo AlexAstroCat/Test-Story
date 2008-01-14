@@ -7,20 +7,20 @@ use lib qw( t/lib lib );
 
 our $verbose = 0;
 our $help = 0;
-our $fixture_root = 'Fixture';
+our $fixture_base = 'Fixture';
 our $file_root = 't/cases';
 our @tags = ();
 GetOptions(
     'verbose'        => \$verbose,
     'help'           => \$help,
-    'fixture_root=s' => \$fixture_root,
+    'fixture_base=s' => \$fixture_base,
     'file_root=s'    => \$file_root,
     'tag=s'          => \@tags,
 );
 @tags = split(/,/, join(',', @tags));
 
 my $a8n = Test::A8N->new({
-    fixture_root => $fixture_root,
+    fixture_base => $fixture_base,
     file_root    => $file_root,
     filenames    => \@ARGV,
     tags         => \@tags,

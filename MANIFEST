@@ -1,5 +1,21 @@
+lib/Test/A8N/File.pm
+lib/Test/A8N.pm
+lib/Test/A8N/TestCase.pm
 Makefile.PL
 MANIFEST
 README
-t/Test-A8N.t
-lib/Test/A8N.pm
+scripts/a8
+t/01_testcase.t
+t/02_file.t
+t/03_a8n.t
+t/cases/System Status/Basic_Status.tc
+t/cases/test1.tc
+t/cases/UI/Config/Accounts/Alert_Recipients.tc
+t/cases/UI/Config/Certificates/Views_Root_CA.tc
+t/cases/UI/Reports/Report_Dashboard.tc
+t/lib/Fixture.pm
+t/lib/Fixture/UI/Config.pm
+t/lib/Fixture/UI.pm
+t/lib/MockFixture.pm
+t/mock/Test/FITesque/Suite.pm
+t/mock/Test/FITesque/Test.pm
