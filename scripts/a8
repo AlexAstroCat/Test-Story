@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Test::A8N;
 use Getopt::Long;
+use Pod::Usage;
 use lib qw( t/lib lib );
 
 our $verbose = 0;
@@ -11,12 +12,14 @@ our $fixture_base = 'Fixture';
 our $file_root = 't/cases';
 our @tags = ();
 GetOptions(
-    'verbose'        => \$verbose,
-    'help'           => \$help,
-    'fixture_base=s' => \$fixture_base,
-    'file_root=s'    => \$file_root,
-    'tag=s'          => \@tags,
-);
+    'verbose'          => \$verbose,
+    'help'             => \$help,
+    'b|fixture_base=s' => \$fixture_base,
+    'r|file_root=s'    => \$file_root,
+    'tag=s'            => \@tags,
+) or usage();
+usage() if $help;
+
 @tags = split(/,/, join(',', @tags));
 
 my $a8n = Test::A8N->new({
@@ -27,3 +30,52 @@ my $a8n = Test::A8N->new({
     verbose      => $verbose,
 });
 $a8n->run_tests();
+
+sub usage {
+    pod2usage();
+}
+
+__END__
+
+=head1 NAME
+
+a8 - Testcase script automation runner
+
+=head1 SYNOPSIS
+
+ a8 [-b <base fixture class>] [-r <test root>] <file>...
+
+=head1 DESCRIPTION
+
+blah blah blah
+
+The options are:
+
+=over 4
+
+=item -arg <foo>
+
+blah blah
+
+=back
+
+blah blah more
+
+=head1 SEE ALSO
+
+L<Test::A8N>, L<Test::FITesque>
+
+=head1 COPYRIGHT
+
+Copyright 2008 Michael Nachbaur.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Michael Nachbaur <mike@nachbaur.com>
+Scott McWhirter <konobi@cpan.org>
+
+=cut
+
