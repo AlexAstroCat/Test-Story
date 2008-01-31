@@ -1,7 +1,7 @@
 TESTLINK_ID: 1337
 ---
-NAME: Test Case 1
-ID: some_test_case_1
+NAME: Test Case With Space
+ID: some_test_with_space
 
 SUMMARY: This is a test summary
 

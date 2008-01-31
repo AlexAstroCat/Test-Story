@@ -42,7 +42,7 @@ has file_paths => (
         my @file_list = ();
         my $wanted = sub {
             my $filename = $File::Find::name;
-            if (-f) {
+            if (-f and /^[^\.].*\.tc$/) {
                 push @file_list, $filename;
             }
         };
@@ -78,4 +78,27 @@ sub run_tests {
     }
 }
 
+# unimport moose functions to make immutable
+no Moose;
+
 1;
+
+__END__
+
+=head1 Test::A8N
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+Add POSTCONTIDIONS support to TestCase.pm
+
+=item *
+
+Add the capability to just run an individual case in a file (e.g. F8 in VIM)
+
+=back
+
+=cut

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 25;
+use Test::More tests => 32;
 use Test::Exception;
 
 BEGIN { 
@@ -16,20 +16,26 @@ Basic_usage: {
 
     ok( Test::A8N::TestCase->meta->has_attribute('id'), q{id attribute}) ;
     ok( Test::A8N::TestCase->meta->has_attribute('name'), q{name attribute}) ;
+    ok( Test::A8N::TestCase->meta->has_attribute('filename'), q{filename attribute}) ;
     ok( Test::A8N::TestCase->meta->has_attribute('tags'), q{tags attribute}) ;
     ok( Test::A8N::TestCase->meta->has_attribute('summary'), q{summary attribute}) ;
+    ok( Test::A8N::TestCase->meta->has_attribute('configuration'), q{configuration attribute}) ;
     ok( Test::A8N::TestCase->meta->has_attribute('instructions'), q{instructions attribute}) ;
     ok( Test::A8N::TestCase->meta->has_attribute('preconditions'), q{preconditions attribute}) ;
+    ok( Test::A8N::TestCase->meta->has_attribute('expected'), q{expected attribute}) ;
 
     ok( Test::A8N::TestCase->meta->has_attribute('test_data'), q{test_data property}) ;
     
     my $tc = Test::A8N::TestCase->new({
         index => 1,
+        filename => "file name",
         data => {
             ID => "some_id",
             NAME => "Test Name",
             SUMMARY => "Summary Test Description",
             TAGS => [qw( tag1 tag2 )],
+            CONFIGURATION => [qw( foo bar )],
+	    EXPECTED => [qw(expected1 expected2)],
             INSTRUCTIONS => [
                 'fixture1',
                 { 'fixture2' => 'foo' },
@@ -41,8 +47,11 @@ Basic_usage: {
     isa_ok($tc, 'Test::A8N::TestCase', q{Created TestCase object});
     is($tc->id, 'some_id', q{TC "ID" correct});
     is($tc->name, 'Test Name', q{TC "name" correct});
+    is($tc->filename, 'file name', q{TC "filename" correct});
     is($tc->summary, 'Summary Test Description', q{TC "summary" correct});
+    is_deeply($tc->configuration, [qw( foo bar )], q{TC "configuration" list});
     is_deeply($tc->tags, [qw( tag1 tag2 )], q{TC "tags" correct});
+    is_deeply($tc->expected, [qw( expected1 expected2 )], q{TC "expected" correct});
     is_deeply(
         $tc->instructions,
         [
@@ -68,6 +77,7 @@ Basic_usage: {
 Implicit_IDs: {
     my $tc = Test::A8N::TestCase->new({
         index => 1,
+        filename => "file name",
         data => {
             NAME => "Test Name",
             SUMMARY => "Summary Test Description",
@@ -85,6 +95,7 @@ Implicit_IDs: {
 Parse_Data: {
     my $tc = Test::A8N::TestCase->new({
         index => 1,
+        filename => "file name",
         data => {
             NAME => "Test Name",
             SUMMARY => "Summary Test Description",
@@ -119,11 +130,16 @@ Parse_Data: {
         [['foo', { baz => 'boo' }]],
         q{Parse hash value fixture}
     );
+    throws_ok {
+        $tc->parse_data([[{ foo => { baz => 'boo' }}]]),
+    } qr{Unable to parse structure of type 'ARRAY'},
+      q{Parse nested value fixture};
 }
 
 Preconditions: {
     my $tc = Test::A8N::TestCase->new({
         index => 1,
+        filename => "file name",
         data => {
             NAME => "Test Name",
             SUMMARY => "Summary Test Description",
@@ -156,6 +172,7 @@ Preconditions: {
 Test_Munger: {
     my $tc = Test::A8N::TestCase->new({
         index => 1,
+        filename => "file name",
         data => {
             NAME => "Test Name",
             SUMMARY => "Summary Test Description",

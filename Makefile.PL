@@ -3,8 +3,10 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Test::A8N',
     VERSION_FROM      => 'lib/Test/A8N.pm',
+    EXE_FILES         => [glob("scripts/*")],
     PREREQ_PM         => {
         'Test::FITesque' => '0.01_002',
+        'Test::Deep'     => 0,
         'Moose'          => 0,  
         'File::Find'     => 0,  
         'YAML::Syck'     => 0,  

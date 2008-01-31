@@ -3,8 +3,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;
+use Test::More tests => 22;
 use Test::Exception;
+use Test::Deep;
 use lib qw(t/mock t/lib);
 
 BEGIN { 
@@ -17,6 +18,7 @@ Basic_usage: {
     ok(Test::A8N::File->meta->has_attribute('fixture_base'), q{fixture_base attribute});
     ok(Test::A8N::File->meta->has_attribute('fixture_class'), q{fixture attribute});
     ok(Test::A8N::File->meta->has_attribute('data'), q{data attribute});
+    ok(Test::A8N::File->meta->has_attribute('testlink_id'), q{id attribute});
     ok(Test::A8N::File->meta->has_attribute('cases'), q{cases attribute});
 
     throws_ok(
@@ -41,6 +43,7 @@ Simple_File: {
     });
     isa_ok($file, 'Test::A8N::File', q{Created File object for test1.tc});
     is($file->filename, 't/cases/test1.tc', q{Filename property contains valid value});
+    is($file->testlink_id, 1337, "File TESTLINK_ID is 1337");
 
     my $test1 = {
         'NAME'         => 'Test Case 1',
@@ -62,19 +65,29 @@ Simple_File: {
 
     $Test::FITesque::Suite::ADDED_TESTS = [];
     $file->run_tests();
-    is_deeply(
+    cmp_deeply(
         $Test::FITesque::Suite::ADDED_TESTS,
         [
             [
-                [ 'MockFixture'                 ],
-                [ 'fixture1'                    ],
-                [ 'fixture2', 'foo'             ],
-                [ 'fixture3', { bar => 'baz' }  ],
-                [ 'fixture4', [qw( boo bork )]  ],
+                [ 'MockFixture', { testcase => ignore() } ],
+                [ 'fixture1'                              ],
+                [ 'fixture2', 'foo'                       ],
+                [ 'fixture3', { bar => 'baz' }            ],
+                [ 'fixture4', [qw( boo bork )]            ],
             ]
         ],
         q{Check that run_tests runs all 4 fixtures}
     );
+}
+
+Files_with_spaces: {
+    my $file = Test::A8N::File->new({
+        filename     => 't/cases/test with spaces.tc',
+        file_root    => 't/cases',
+        fixture_base => 'MockFixture',
+    });
+    isa_ok($file, 'Test::A8N::File', q{Created File object for "test with spaces.tc"});
+    is($file->filename, 't/cases/test with spaces.tc', q{Filename property contains valid value});
 }
 
 Inherited_Fixtures: {
@@ -85,5 +98,14 @@ Inherited_Fixtures: {
     });
     isa_ok($file, 'Test::A8N::File', q{Created File object for Alert_Recipients.tc});
     is($file->fixture_class, 'Fixture::UI::Config', q{Inherited fixture class located});
+}
+
+Fixtures_With_Spaces: {
+    my $file = Test::A8N::File->new({
+        filename     => 't/cases/System Status/Basic Status.tc',
+        file_root    => 't/cases',
+        fixture_base => 'Fixture',
+    });
+    is($file->fixture_class, 'Fixture::SystemStatus', q{Fixture class has been found for a directory with a space});
 }
 

@@ -4,7 +4,7 @@ lib/Test/A8N/TestCase.pm
 Makefile.PL
 MANIFEST
 README
-scripts/a8
+scripts/a8it
 t/01_testcase.t
 t/02_file.t
 t/03_a8n.t
@@ -19,3 +19,4 @@ t/lib/Fixture/UI.pm
 t/lib/MockFixture.pm
 t/mock/Test/FITesque/Suite.pm
 t/mock/Test/FITesque/Test.pm
+META.yml                                 Module meta-data (added by MakeMaker)

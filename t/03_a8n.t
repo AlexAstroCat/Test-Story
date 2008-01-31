@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use lib qw(t/mock t/lib);
 
-use Test::More tests => 14;
+use Test::More tests => 15;
+use Test::Deep;
 BEGIN { 
     use_ok('Test::A8N') 
 };
@@ -27,19 +28,20 @@ Basic_usage: {
 
     $Test::FITesque::Suite::ADDED_TESTS = [];
     $obj->run_tests();
-    is_deeply(
+    cmp_deeply(
         $Test::FITesque::Suite::ADDED_TESTS,
         [
             [
-                [ 'MockFixture'                 ],
-                [ 'fixture1'                    ],
-                [ 'fixture2', 'foo'             ],
-                [ 'fixture3', { bar => 'baz' }  ],
-                [ 'fixture4', [qw( boo bork )]  ],
+                [ 'MockFixture', { testcase => ignore() } ],
+                [ 'fixture1'                              ],
+                [ 'fixture2', 'foo'                       ],
+                [ 'fixture3', { bar => 'baz' }            ],
+                [ 'fixture4', [qw( boo bork )]            ],
             ]
         ],
         q{Check that run_tests runs all 4 fixtures}
     );
+    isa_ok($Test::FITesque::Suite::ADDED_TESTS->[0][0][1]->{testcase}, 'Test::A8N::TestCase');
 }
 
 Directories: {
@@ -50,9 +52,10 @@ Directories: {
     });
     ok(ref $obj->file_paths() eq 'ARRAY', q{file_paths returns array ref});
 
+    my @files = grep {/\.tc/} @{ $obj->file_paths };
     is_deeply(
-        $obj->file_paths,
-        [qw(
+        [ sort @files ],
+        [ sort qw(
             t/cases/UI/Reports/Report_Dashboard.tc
             t/cases/UI/Config/Certificates/Views_Root_CA.tc
             t/cases/UI/Config/Accounts/Alert_Recipients.tc
@@ -67,15 +70,17 @@ Directories_All: {
         file_root => 't/cases',
     });
 
+    my @files = grep {/\.tc/} @{ $obj->file_paths };
     is_deeply(
-        $obj->file_paths,
-        [
+        [ sort @files ],
+        [ sort(
             't/cases/test1.tc',
+            't/cases/test with spaces.tc',
             't/cases/UI/Reports/Report_Dashboard.tc',
             't/cases/UI/Config/Certificates/Views_Root_CA.tc',
             't/cases/UI/Config/Accounts/Alert_Recipients.tc',
-            't/cases/System Status/Basic_Status.tc',
-        ],
+            't/cases/System Status/Basic Status.tc',
+        )],
         q{Check file list when no filename is selected, e.g. "All Files"}
     );
 }

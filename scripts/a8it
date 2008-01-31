@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib qw( t/lib lib fixtures fixtures/Sophos-A8N/lib selenium/lib );
+use Test::A8N;
+use Getopt::Long;
+use Pod::Usage;
+use YAML::Syck;
+
+our $config = {};
+my $home = $ENV{HOME};
+if (-f glob("$home/.a8rc")) {
+    $config = LoadFile(glob("$home/.a8rc"))->{a8};
+}
+
+our $verbose = 0;
+our $help = 0;
+our $fixture_base;
+our $file_root;
+our @tags = ();
+GetOptions(
+    'verbose'          => \$verbose,
+    'help'             => \$help,
+    'b|fixture_base=s' => \$fixture_base,
+    'r|file_root=s'    => \$file_root,
+    'tag=s'            => \@tags,
+) or usage();
+usage() if $help;
+
+@tags = split(/,/, join(',', @tags));
+
+my $a8n = Test::A8N->new({
+    fixture_base => ($fixture_base || $config->{fixture_base} || "Sophos::Tank::Fixture"),
+    file_root    => ($file_root || $config->{file_root} || "cases/testlink"),
+    filenames    => \@ARGV,
+    tags         => \@tags,
+    verbose      => $verbose,
+});
+$a8n->run_tests();
+
+sub usage {
+    pod2usage();
+}
+
+__END__
+
+=head1 NAME
+
+a8it - Testcase script automation runner
+
+=head1 SYNOPSIS
+
+ a8it [-b <base fixture class>] [-r <test root>] <file>...
+
+ Use `perldoc a8it' for more help documentation.
+
+=head1 DESCRIPTION
+
+blah blah blah
+
+The options are:
+
+=over 4
+
+=item -b | --fixture_base <base>
+
+The Perl base class to use for your test case fixtures
+
+=item -r | --file_root <path>
+
+The path or directory where your test cases live under.
+
+=item -t | --tag <tag>
+
+The name of a tag that you wish to search for to limit which test cases you run.  You can specify this command
+multiple times to indicate multiple tags, or you can separate them by commas.  For instance:
+
+    a8it -t smoke -t email
+    a8it -t smoke,email
+
+=item -v | --verbose
+
+Enable verbose mode
+TODO Not currently implemented
+
+=item -h | --help
+
+Basic help usage
+
+=back
+
+=head1 SEE ALSO
+
+L<Test::A8N>, L<Test::FITesque>
+
+=head1 AUTHOR
+
+Michael Nachbaur <mike@nachbaur.com>
+Scott McWhirter <konobi@cpan.org>
+
+=cut
+

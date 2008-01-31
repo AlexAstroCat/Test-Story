@@ -16,6 +16,12 @@ has data => (
     isa      => q{HashRef}
 );
 
+has filename => (
+    is       => q{ro},
+    required => 1,
+    isa      => q{Str}
+);
+
 has index => (
     is       => q{ro},
     required => 1,
@@ -67,6 +73,18 @@ has tags => (
     }
 );
 
+has configuration => (
+    %default_lazy,
+    isa     => q{ArrayRef},
+    default => sub { 
+        my $self = shift;
+        if (ref $self->data->{CONFIGURATION} eq 'ARRAY') {
+            return [@{ $self->data->{CONFIGURATION} }];
+        }
+        return [];
+    }
+);
+
 has instructions => (
     %default_lazy,
     isa     => q{ArrayRef},
@@ -74,6 +92,18 @@ has instructions => (
         my $self = shift;
         if (ref $self->data->{INSTRUCTIONS} eq 'ARRAY') {
             return [@{ $self->data->{INSTRUCTIONS} }];
+        }
+        return [];
+    }
+);
+
+has expected => (
+    %default_lazy,
+    isa     => q{ArrayRef},
+    default => sub { 
+        my $self = shift;
+        if (ref $self->data->{EXPECTED} eq 'ARRAY') {
+            return [@{ $self->data->{EXPECTED} }];
         }
         return [];
     }
@@ -119,9 +149,16 @@ sub parse_data {
             my ($value) = $test->{$name};
             push @tests, [$name, $value];
         }
+
+        else {
+          die "Unable to parse structure of type '".ref($test)."'";
+        }
     }
     return \@tests;
 }
+
+# unimport moose functions and make immutable
+no Moose;
 
 1;
 __END__
