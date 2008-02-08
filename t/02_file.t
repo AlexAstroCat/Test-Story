@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More tests => 22;
 use Test::Exception;
 use Test::Deep;
 use lib qw(t/mock t/lib);
@@ -18,7 +18,6 @@ Basic_usage: {
     ok(Test::A8N::File->meta->has_attribute('fixture_base'), q{fixture_base attribute});
     ok(Test::A8N::File->meta->has_attribute('fixture_class'), q{fixture attribute});
     ok(Test::A8N::File->meta->has_attribute('data'), q{data attribute});
-    ok(Test::A8N::File->meta->has_attribute('testlink_id'), q{id attribute});
     ok(Test::A8N::File->meta->has_attribute('cases'), q{cases attribute});
 
     throws_ok(
@@ -43,7 +42,6 @@ Simple_File: {
     });
     isa_ok($file, 'Test::A8N::File', q{Created File object for test1.tc});
     is($file->filename, 't/cases/test1.tc', q{Filename property contains valid value});
-    is($file->testlink_id, 1337, "File TESTLINK_ID is 1337");
 
     my $test1 = {
         'NAME'         => 'Test Case 1',
