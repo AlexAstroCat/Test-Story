@@ -33,6 +33,12 @@ has fixture_base => (
     isa         => q{Str}
 );
 
+has verbose => (
+    is          => q{rw},
+    required    => 0,
+    isa         => q{Bool}
+);
+
 has data => (
     %default_lazy,
     isa     => q{ArrayRef},
@@ -43,20 +49,6 @@ has data => (
     }
 );
 
-has testlink_id => (
-    %default_lazy,
-    isa	    => q{Int},
-    default => sub {
-	my $self = shift;
-	if (exists ${$self->data}[0]{TESTLINK_ID}) {
-	    my $c = shift @{$self->data};
-	    return $c->{TESTLINK_ID};
-	}
-	warn "No TESTLINK_ID in file: " . $self->filename;
-	return -1;
-    }
-);
-
 has cases => (
     %default_lazy,
     isa     => q{ArrayRef},
@@ -64,7 +56,6 @@ has cases => (
         my $self = shift;
         my @cases;
         my $idx = 0;
-	$self->testlink_id;
         my $filename = $self->filename;
         foreach my $case (@{ $self->data }) {
             push @cases, new Test::A8N::TestCase({
@@ -92,10 +83,11 @@ has fixture_class => (
         $filename =~ s/\s+//g;
         my @path = split('/', $filename);
         pop @path; # take off the filename
-        unshift @path, $self->fixture_base;
+        unshift @path, split(/::/, $self->fixture_base);
 
         while ($#path > -1) {
             my $class = join('::', @path);
+            warn "Attempting to load fixture class $class\n" if ($self->verbose);
             eval { 
                 load($class);
             };
@@ -117,16 +109,11 @@ sub run_tests {
     my $suite = Test::FITesque::Suite->new();
 
     my $cases = $self->cases();
-    # XXX - THIS IS A TEMPORARY ADDITION
-    # Test cases should run independently so we shuffle them up to make
-    # sure that we don't depend on the order.
-    shuffle($cases);
-
     foreach my $case (@{ $cases }) {
         my @data = @{ $case->test_data };
         my $test = Test::FITesque::Test->new({
             data => [ 
-                [$self->fixture_class, { testcase => $case } ], 
+                [$self->fixture_class, { testcase => $case, verbose => $self->verbose } ], 
                 @data 
             ],
         });
@@ -144,19 +131,9 @@ sub BUILD {
     }
 }
 
-sub shuffle {
-    my $array = shift;
-    my $i;
-    for ($i = @$array; --$i; ) {
-        my $j = int rand ($i+1);
-        next if $i == $j;
-        @$array[$i,$j] = @$array[$j,$i];
-    }
-}
-
-
 # unimport moose functions and make immutable
 no Moose;
+__PACKAGE__->meta->make_immutable();
 
 1;
 __END__

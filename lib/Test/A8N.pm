@@ -14,6 +14,12 @@ my %default_lazy = (
     default  => sub { die "need to override" },
 );
 
+has verbose => (
+    is          => q{rw},
+    required    => 0,
+    isa         => q{Bool}
+);
+
 has filenames => (
     is          => q{rw},
     required    => 0,
@@ -32,6 +38,15 @@ has fixture_base => (
     isa         => q{Str}
 );
 
+has allowed_extensions => (
+    is       => q(rw),
+    required => 1,
+    isa      => q{ArrayRef},
+    default  => sub {
+        return ["tc"];
+    }
+);
+
 has file_paths => ( 
     is       => q{ro}, 
     required => 1, 
@@ -42,8 +57,10 @@ has file_paths => (
         my @file_list = ();
         my $wanted = sub {
             my $filename = $File::Find::name;
-            if (-f and /^[^\.].*\.tc$/) {
-                push @file_list, $filename;
+            for my $extension (@{$self->allowed_extensions}) {
+                if (-f and /^[^\.].*\.$extension$/) {
+                    push @file_list, $filename;
+                }
             }
         };
         my $root = $self->file_root;
@@ -65,6 +82,7 @@ has files => (
                 filename     => $filename,
                 fixture_base => $self->fixture_base,
                 file_root    => $self->file_root,
+                verbose      => $self->verbose ? 1 : 0,
             });
         }
         return \@files;
@@ -80,6 +98,7 @@ sub run_tests {
 
 # unimport moose functions to make immutable
 no Moose;
+__PACKAGE__->meta->make_immutable();
 
 1;
 

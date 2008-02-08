@@ -121,6 +121,18 @@ has preconditions => (
     }
 );
 
+has postconditions => (
+    %default_lazy,
+    isa     => q{ArrayRef},
+    default => sub { 
+        my $self = shift;
+        if (ref $self->data->{POSTCONDITIONS} eq 'ARRAY') {
+            return [@{ $self->data->{POSTCONDITIONS} }];
+        }
+        return [];
+    }
+);
+
 has test_data => (
     %default_lazy,
     isa     => q{ArrayRef},
@@ -129,6 +141,7 @@ has test_data => (
         return $self->parse_data([
             @{ $self->preconditions },
             @{ $self->instructions },
+            @{ $self->postconditions },
         ]);
     }
 );
@@ -159,6 +172,7 @@ sub parse_data {
 
 # unimport moose functions and make immutable
 no Moose;
+__PACKAGE__->meta->make_immutable();
 
 1;
 __END__

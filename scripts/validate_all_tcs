@@ -22,7 +22,7 @@ find(\&wanted, $directory);
 summary();
 
 sub wanted {
-    if($File::Find::name =~ m{\.tc$}){
+    if($File::Find::name =~ m{\.st$}){
 	print "Validating file $File::Find::name\n" if $verbose;
 	my $output = qx(validate_tc '$File::Find::name' 2>&1);
 	print $output if $verbose;

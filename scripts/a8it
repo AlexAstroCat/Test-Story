@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use lib qw( t/lib lib fixtures fixtures/Sophos-A8N/lib selenium/lib );
+use lib qw( t/lib blib lib );
 use Test::A8N;
 use Getopt::Long;
 use Pod::Usage;
@@ -10,7 +10,11 @@ use YAML::Syck;
 our $config = {};
 my $home = $ENV{HOME};
 if (-f glob("$home/.a8rc")) {
-    $config = LoadFile(glob("$home/.a8rc"))->{a8};
+    $config = LoadFile(glob("$home/.a8rc"));
+}
+
+if ($config->{fixture_root}) {
+    lib->import($config->{fixture_root});
 }
 
 our $verbose = 0;
@@ -30,11 +34,12 @@ usage() if $help;
 @tags = split(/,/, join(',', @tags));
 
 my $a8n = Test::A8N->new({
-    fixture_base => ($fixture_base || $config->{fixture_base} || "Sophos::Tank::Fixture"),
-    file_root    => ($file_root || $config->{file_root} || "cases/testlink"),
-    filenames    => \@ARGV,
-    tags         => \@tags,
-    verbose      => $verbose,
+    fixture_base       => ($fixture_base || $config->{fixture_base} || "Fixture"),
+    file_root          => ($file_root || $config->{file_root} || "cases"),
+    filenames          => \@ARGV,
+    tags               => \@tags,
+    verbose            => $verbose,
+    allowed_extensions => ["tc", "st"],
 });
 $a8n->run_tests();
 
@@ -46,7 +51,7 @@ __END__
 
 =head1 NAME
 
-a8it - Testcase script automation runner
+a8it - Story-test testcase script automation runner
 
 =head1 SYNOPSIS
 
@@ -56,7 +61,8 @@ a8it - Testcase script automation runner
 
 =head1 DESCRIPTION
 
-blah blah blah
+a8it is the command-line utility for Test::A8N, which allows you to run automated story test cases to perform system and live-site automation checks for
+quality assurance and test purposes.
 
 The options are:
 
@@ -72,8 +78,9 @@ The path or directory where your test cases live under.
 
 =item -t | --tag <tag>
 
-The name of a tag that you wish to search for to limit which test cases you run.  You can specify this command
-multiple times to indicate multiple tags, or you can separate them by commas.  For instance:
+The name of a tag that you wish to search for to limit which test cases you run.  You
+can specify this command multiple times to indicate multiple tags, or you can separate
+them by commas.  For instance:
 
     a8it -t smoke -t email
     a8it -t smoke,email
@@ -81,7 +88,6 @@ multiple times to indicate multiple tags, or you can separate them by commas.  F
 =item -v | --verbose
 
 Enable verbose mode
-TODO Not currently implemented
 
 =item -h | --help
 

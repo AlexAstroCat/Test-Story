@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 24;
 use Test::Exception;
 use Test::Deep;
 use lib qw(t/mock t/lib);
@@ -69,11 +69,11 @@ Simple_File: {
         $Test::FITesque::Suite::ADDED_TESTS,
         [
             [
-                [ 'MockFixture', { testcase => ignore() } ],
-                [ 'fixture1'                              ],
-                [ 'fixture2', 'foo'                       ],
-                [ 'fixture3', { bar => 'baz' }            ],
-                [ 'fixture4', [qw( boo bork )]            ],
+                [ 'MockFixture', { testcase => ignore(), verbose => ignore() } ],
+                [ 'fixture1'                                                   ],
+                [ 'fixture2', 'foo'                                            ],
+                [ 'fixture3', { bar => 'baz' }                                 ],
+                [ 'fixture4', [qw( boo bork )]                                 ],
             ]
         ],
         q{Check that run_tests runs all 4 fixtures}
@@ -88,6 +88,16 @@ Files_with_spaces: {
     });
     isa_ok($file, 'Test::A8N::File', q{Created File object for "test with spaces.tc"});
     is($file->filename, 't/cases/test with spaces.tc', q{Filename property contains valid value});
+}
+
+Files_with_different_extensions: {
+    my $file = Test::A8N::File->new({
+        filename     => 't/cases/storytest.st',
+        file_root    => 't/cases',
+        fixture_base => 'MockFixture',
+    });
+    isa_ok($file, 'Test::A8N::File', q{Created File object for "storytest.st"});
+    is($file->filename, 't/cases/storytest.st', q{Filename property contains valid value});
 }
 
 Inherited_Fixtures: {

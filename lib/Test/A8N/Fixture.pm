@@ -11,6 +11,18 @@ BEGIN {
 use Test::More;
 use YAML::Syck;
 use File::Temp qw(tempfile);
+use WWW::Selenium;
+our @EXCLUDE_METHODS = qw(
+    config
+    selenium
+    testcase
+    ctxt
+    verbose
+    page_mapping
+    parse_method_string
+    disallowed_phrases
+    parse_arguments
+);
 
 sub BUILD {
     my $self = shift;
@@ -18,12 +30,16 @@ sub BUILD {
     if ($params->{QUIET} || $ENV{QUIET_FIXTURES}) {
         Test::Builder->new->no_diag(1);
     }
-    diag sprintf(q{Using fixture class "%s"}, blessed($self));
+    diag sprintf(q{Using fixture class "%s"}, blessed($self))
+        if ($self->verbose);
     diag "START: " . $self->testcase->id;
 }
 
 sub DEMOLISH {
     my $self = shift;
+    if (exists $self->ctxt->{selenium}) {
+        $self->ctxt->{selenium}->stop();
+    }
     diag "FINISH: " . $self->testcase->id;
 }
 
@@ -40,7 +56,7 @@ has 'config' => (
         my @config_files = @{ $tc_config };
 
         my $file_config = $self->testcase->filename;
-        $file_config =~ s/\.tc$/.conf/;
+        $file_config =~ s/\.st$/.conf/;
         push @config_files, $file_config
            if (-f $file_config);
 
@@ -69,6 +85,21 @@ has 'ctxt' => (
     lazy => 1,
 );
 
+has verbose => (
+    is          => q{rw},
+    required    => 0,
+    isa         => q{Bool}
+);
+
+sub page_mapping {
+    my $self = shift;
+    my ($url) = @_;
+    if ($url =~ m#^/#) {
+        return $url;
+    }
+    die sprintf("Can't find the URL for %s", $url);
+}
+
 # NB: this is a FITesque method, please do not edit.
 sub parse_method_string {
   my ($self, $method_string) = @_;
@@ -78,6 +109,10 @@ sub parse_method_string {
   if($method_name =~ m{^_}){
     warn "Cannot call '$method_name' from test cases";
     return undef;
+  }
+
+  if (ref($self) and $self->verbose) {
+      diag "Fixture method $method_name";
   }
 
   # Don't allow testcases to talk about implementaion details
@@ -100,16 +135,14 @@ sub parse_method_string {
 
 sub disallowed_phrases {
   my ($self) = @_;
-  return qw(sophox configd upkeep hexcd);
+  return qw();
 }
 
 sub selenium {
     my $self = shift;
-    # Return a previously-created selenium object for this appliance
-    my $app_name = $self->appliance->hostname;
 
-    return $self->ctxt->{selenium}->{$app_name}
-        if (exists $self->ctxt->{selenium}->{$app_name});
+    return $self->ctxt->{selenium}
+        if (exists $self->ctxt->{selenium});
 
     my %args = (
         host => $self->_get_metavar('selenium.server'),
@@ -123,12 +156,11 @@ sub selenium {
     }
 
     $args{browser} = "*$args{browser}" if (exists $args{browser});
-    $args{browser_url} = $self->appliance->admin_url
-        unless (exists($args{browser_url}));
 
     # Create, save and return a selenium object for this appliance
-    $self->ctxt->{selenium}->{$app_name} = Sophos::Tank::Selenium->new( %args );
-    return $self->ctxt->{selenium}->{$app_name};
+    $self->ctxt->{selenium} = WWW::Selenium->new( %args );
+    $self->ctxt->{selenium}->start();
+    return $self->ctxt->{selenium};
 }
 
 sub _get_metavar {
@@ -145,21 +177,108 @@ sub _get_metavar {
     return $config_ref;
 }
 
+sub _parse_metavars {
+    my $self = shift;
+    my ($str) = @_;
+    $str ||= '';
+
+    my @keys = $str =~ /\$\(([^\)]+)\)/g;
+    foreach (@keys) {
+        my $value = $self->_get_metavar($_);
+        $str =~ s/\$\($_\)/$value/g;
+    }
+
+    return $str;
+}
+sub _recurse_parse_arguments {
+    my $self = shift;
+    my $arg = shift;
+    if (ref($arg) eq 'HASH') {
+        foreach my $key (keys %$arg) {
+            if (ref($arg->{$key})) {
+                $arg->{$key} = $self->_recurse_parse_arguments($arg->{$key});
+            } else {
+                $arg->{$key} = $self->_parse_metavars($arg->{$key});
+            }
+        }
+    } elsif (ref($arg) eq 'ARRAY') {
+        foreach my $idx (0 .. scalar(@$arg) - 1) {
+            if (ref($arg->[$idx])) {
+                $arg->[$idx] = $self->_recurse_parse_arguments($arg->[$idx]);
+            } else {
+                $arg->[$idx] = $self->_parse_metavars($arg->[$idx]);
+            }
+        }
+    } else {
+        $arg = $self->_parse_metavars($arg);
+    }
+    return $arg;
+}
+
 # NB: This is a FITesque required function
 sub parse_arguments {
     my $self = shift;
+    return @_ if !ref($self);
+
     my @args = ();
+    my $recurse;
+
     foreach my $arg (@_) {
-        next unless ($arg);
-        if (my ($name) = $arg =~ /\$\(([^\)]+)\)/) {
-            my $value = $self->_get_metavar($name);
-            $arg =~ s/\$\($name\)/$value/g;
-        }
-        push @args, $arg;
+        push @args, $self->_recurse_parse_arguments($arg);
     }
     return @args;
 }
 
-1;
+=head1 FIXTURE ACTIONS
 
+=cut
+
+=head2 todo fail
+
+  todo fail: [ message ]
+
+Marks a place in the test case where you would like it to fail, flagging it as a TODO item.
+
+=cut
+
+sub todo_fail {
+    my $self = shift;
+    my ($arg) = @_;
+    TODO: {
+        local $TODO = "Marked as a failing TODO: $arg";
+        fail($arg);
+    }
+}
+
+=head2 goto page
+
+  goto page: /some/url
+  goto page: PageName
+
+Sets the current browser context to a page, either using the absolute path supplied, or
+using an abstract page name as defined by the page_mapping hash.  Either set this at run-time,
+or override it in a subclass.
+
+=cut
+
+sub goto_page {
+    my $self = shift;
+    my ($page) = @_;
+
+    $self->selenium->open( $self->page_mapping($page) );
+    if ($self->config->{selenium}->{browser} eq 'firefox' and !exists($self->{resized})) {
+        #$self->selenium->resizeWindow();
+        #$self->{resized} = 1;
+    }
+}
+
+
+1;
 __END__
+
+=head1 SEE ALSO
+
+L<Test::A8N>, L<Test::FITesque::Fixture>
+
+=cut
+

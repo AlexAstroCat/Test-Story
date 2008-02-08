@@ -19,4 +19,3 @@ t/lib/Fixture/UI.pm
 t/lib/MockFixture.pm
 t/mock/Test/FITesque/Suite.pm
 t/mock/Test/FITesque/Test.pm
-META.yml                                 Module meta-data (added by MakeMaker)
