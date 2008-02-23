@@ -12,6 +12,7 @@ use Test::More;
 use YAML::Syck;
 use File::Temp qw(tempfile);
 use WWW::Selenium;
+use Test::A8N::VMWare;
 our @EXCLUDE_METHODS = qw(
     config
     selenium
@@ -27,12 +28,13 @@ our @EXCLUDE_METHODS = qw(
 sub BUILD {
     my $self = shift;
     my ($params) = @_;
-    if ($params->{QUIET} || $ENV{QUIET_FIXTURES}) {
+    if (!$self->verbose || $params->{QUIET} || $ENV{QUIET_FIXTURES}) {
         Test::Builder->new->no_diag(1);
     }
     diag sprintf(q{Using fixture class "%s"}, blessed($self))
         if ($self->verbose);
-    diag "START: " . $self->testcase->id;
+    diag "START: " . $self->testcase->id
+        if ($self->verbose);
 }
 
 sub DEMOLISH {
@@ -40,7 +42,8 @@ sub DEMOLISH {
     if (exists $self->ctxt->{selenium}) {
         $self->ctxt->{selenium}->stop();
     }
-    diag "FINISH: " . $self->testcase->id;
+    diag "FINISH: " . $self->testcase->id
+        if ($self->verbose);
 }
 
 has 'config' => (
@@ -72,9 +75,30 @@ has 'config' => (
     }
 );
 
+has 'vmware' => (
+    is => 'ro',
+    required => 1,
+    isa => 'Object',
+    lazy => 1,
+    default => sub { 
+        my $self = shift;
+        my $config = $self->config->{selenium}->{"virtual machine"};
+        return undef unless($config);
+        return Test::A8N::VMWare->new({ config => $config });
+    },
+);
+
 has 'testcase' => (
     is => 'rw',
     isa => 'Object'
+);
+
+has 'selenium_class' => (
+    is => 'rw',
+    required => 1,
+    isa => 'Str',
+    default => sub { "WWW::Selenium"; },
+    lazy => 1,
 );
 
 has 'ctxt' => (
@@ -94,10 +118,9 @@ has verbose => (
 sub page_mapping {
     my $self = shift;
     my ($url) = @_;
-    if ($url =~ m#^/#) {
-        return $url;
-    }
-    die sprintf("Can't find the URL for %s", $url);
+    my $base = $self->_get_metavar('selenium.browser_url');
+    $base =~ s/\/$//;
+    return "$base$url";
 }
 
 # NB: this is a FITesque method, please do not edit.
@@ -144,6 +167,16 @@ sub selenium {
     return $self->ctxt->{selenium}
         if (exists $self->ctxt->{selenium});
 
+    if (exists $self->config->{selenium}->{"virtual machine"}) {
+        my $vm = $self->vmware;
+        if ($vm) {
+            $vm->start if (!$vm->is_running);
+            if (!$self->_get_metavar('selenium.server')) {
+                $self->config->{selenium}{server} = $vm->guest_ip;
+            }
+        }
+    }
+
     my %args = (
         host => $self->_get_metavar('selenium.server'),
         port => $self->_get_metavar('selenium.port'),
@@ -158,7 +191,10 @@ sub selenium {
     $args{browser} = "*$args{browser}" if (exists $args{browser});
 
     # Create, save and return a selenium object for this appliance
-    $self->ctxt->{selenium} = WWW::Selenium->new( %args );
+    my $class = $self->selenium_class;
+    eval "use $class;";
+    die "$@\n" if $@;
+    $self->ctxt->{selenium} = $class->new( %args );
     $self->ctxt->{selenium}->start();
     return $self->ctxt->{selenium};
 }
@@ -229,6 +265,28 @@ sub parse_arguments {
     return @args;
 }
 
+sub _squish_array {
+    my $self = shift;
+    my ($arg) = @_;
+    my $array;
+    if (ref($arg) eq 'ARRAY') {
+        $array = $arg;
+    } elsif (defined($arg)) {
+        $array = [$arg];
+    } else {
+        $array = [];
+    }
+    return wantarray ? @{ $array } : $array;
+}
+
+sub _lowercase_args {
+    my $self = shift;
+    my ($args) = @_;
+    foreach my $field (keys %$args) {
+        $args->{lc($field)} = delete $args->{$field};
+    }
+}
+
 =head1 FIXTURE ACTIONS
 
 =cut
@@ -266,9 +324,12 @@ sub goto_page {
     my ($page) = @_;
 
     $self->selenium->open( $self->page_mapping($page) );
-    if ($self->config->{selenium}->{browser} eq 'firefox' and !exists($self->{resized})) {
-        #$self->selenium->resizeWindow();
-        #$self->{resized} = 1;
+}
+
+sub ensure_testing_environment_is_in_a_consistent_state {
+    my $self = shift;
+    if ($self->vmware->is_valid) {
+        $self->vmware->revertSnapshot();
     }
 }
 
