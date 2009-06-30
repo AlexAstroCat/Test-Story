@@ -58,6 +58,7 @@ has cases => (
         my $idx = 0;
         my $filename = $self->filename;
         foreach my $case (@{ $self->data }) {
+            next unless $case;
             push @cases, new Test::A8N::TestCase({
                 data    => $case,
                 'index' => ++$idx,
