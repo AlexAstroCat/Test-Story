@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 23;
 use Test::Exception;
 use Test::Deep;
 use lib qw(t/mock t/lib);
@@ -56,7 +56,8 @@ Simple_File: {
         ],
         'EXPECTED'     => 'Some output',
     };
-    is_deeply($file->data, [$test1], q{YAML data returned correctly});
+    is_deeply($file->data, [$test1,undef], q{YAML data returned correctly});
+    is( scalar @{ $file->cases }, 1, q{cases() returns correct number of cases} );
     isa_ok($file->cases->[0], 'Test::A8N::TestCase', q{cases() returned a Test::A8N::TestCase object});
     is($file->fixture_base, 'MockFixture', q{fixture_base property matches what was supplied});
     is($file->fixture_class, 'MockFixture', q{Correct fixture class located});
