@@ -43,7 +43,7 @@ has allowed_extensions => (
     required => 1,
     isa      => q{ArrayRef},
     default  => sub {
-        return ["tc"];
+        return ["tc", "st"];
     }
 );
 
