@@ -1,4 +1,4 @@
-package Test::A8N::TestCase;
+package Test::Story::TestCase;
 
 # NB: Moose also enforces 'strict' and warnings;
 use Moose;

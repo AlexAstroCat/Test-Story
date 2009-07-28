@@ -1,4 +1,4 @@
-package Test::A8N::Tutorial;
+package Test::Story::Tutorial;
 
 1; # Wuuuuut?
 
@@ -6,7 +6,7 @@ __END__
 
 =head1 NAME
 
-Test::A8N::Tutorial -- How to write automation tests
+Test::Story::Tutorial -- How to write automation tests
 
 =head1 WRITING A TESTCASE
 
@@ -15,7 +15,7 @@ Test::A8N::Tutorial -- How to write automation tests
 Writing a test should not be a difficult part of creating an application. The
 more difficult writing tests is, the less likely they will be written.
 
-To solve this, Test::A8N makes it possible to write tests using natural 
+To solve this, Test::Story makes it possible to write tests using natural 
 language (with some special formatting so that it can be parsed by the system).
 
 Here is an example testcase:
@@ -147,8 +147,12 @@ can specify exactly how many.
      ok( ); # $username exists
  }
 
-Test::A8N will calculate the correct number of tests to plan, and then it 
+Test::Story will calculate the correct number of tests to plan, and then it 
 will run the tests.
+
+=head2 CHOOSING GOOD METHOD NAMES
+
+... TODO ...
 
 =head1 RUNNING THE TESTCASE
 
@@ -161,15 +165,15 @@ do the following:
  # profile.t -- Run the tests in profile.tc
  
  use strict;
- use Test::A8N;
+ use Test::Story;
 
- my $runner = Test::A8N->new(
+ my $runner = Test::Story->new(
     file_root       => 'cases',
     fixture_base    => 'MyFixture',
  );
  $runner->run_tests;
 
 
-... CONTINUED
+... TODO ...
 
 

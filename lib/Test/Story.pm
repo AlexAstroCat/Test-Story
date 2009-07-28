@@ -1,8 +1,8 @@
-package Test::A8N;
+package Test::Story;
 
 # NB: Moose also enforces 'strict' and warnings;
 use Moose;
-use Test::A8N::File;
+use Test::Story::File;
 use File::Find;
 
 our $VERSION = '0.01';
@@ -78,7 +78,7 @@ has files => (
         my $self = shift;
         my @files = ();
         for my $filename ( @{ $self->file_paths } ) {
-            push @files, Test::A8N::File->new({
+            push @files, Test::Story::File->new({
                 filename     => $filename,
                 fixture_base => $self->fixture_base,
                 file_root    => $self->file_root,
@@ -104,7 +104,7 @@ __PACKAGE__->meta->make_immutable();
 
 __END__
 
-=head1 Test::A8N
+=head1 Test::Story
 
 =head1 TODO
 

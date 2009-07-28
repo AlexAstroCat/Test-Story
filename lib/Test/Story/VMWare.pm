@@ -1,4 +1,4 @@
-package Test::A8N::VMWare;
+package Test::Story::VMWare;
 
 use Moose;
 use lib 't/lib';

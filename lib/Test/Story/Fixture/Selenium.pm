@@ -1,4 +1,4 @@
-package Test::A8N::Fixture::Selenium;
+package Test::Story::Fixture::Selenium;
 use warnings;
 use strict;
 
@@ -88,6 +88,6 @@ __END__
 
 =head1 SEE ALSO
 
-L<Test::A8N::Fixture>
+L<Test::Story::Fixture>
 
 =cut

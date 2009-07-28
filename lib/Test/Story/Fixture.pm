@@ -1,4 +1,4 @@
-package Test::A8N::Fixture;
+package Test::Story::Fixture;
 
 use Moose;
 
@@ -12,7 +12,7 @@ use Test::More;
 use YAML::Syck;
 use File::Temp qw(tempfile);
 use WWW::Selenium;
-use Test::A8N::VMWare;
+use Test::Story::VMWare;
 our @EXCLUDE_METHODS = qw(
     config
     selenium
@@ -84,7 +84,7 @@ has 'vmware' => (
         my $self = shift;
         my $config = $self->config->{selenium}->{"virtual machine"};
         return undef unless($config);
-        return Test::A8N::VMWare->new({ config => $config });
+        return Test::Story::VMWare->new({ config => $config });
     },
 );
 
@@ -339,7 +339,7 @@ __END__
 
 =head1 SEE ALSO
 
-L<Test::A8N>, L<Test::FITesque::Fixture>
+L<Test::Story>, L<Test::FITesque::Fixture>
 
 =cut
 

@@ -1,9 +1,9 @@
-package Test::A8N::File;
+package Test::Story::File;
 
 # NB: Moose also enforces 'strict' and warnings;
 use Moose;
 use YAML::Syck;
-use Test::A8N::TestCase;
+use Test::Story::TestCase;
 use Module::Load;
 use Test::FITesque::Suite;
 use Test::FITesque::Test;
@@ -59,7 +59,7 @@ has cases => (
         my $filename = $self->filename;
         foreach my $case (@{ $self->data }) {
             next unless $case;
-            push @cases, new Test::A8N::TestCase({
+            push @cases, new Test::Story::TestCase({
                 data    => $case,
                 'index' => ++$idx,
                 filename => $filename,
