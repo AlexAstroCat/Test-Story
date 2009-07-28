@@ -9,20 +9,20 @@ use Test::Deep;
 use lib qw(t/mock t/lib);
 
 BEGIN { 
-    use_ok('Test::A8N::File') 
+    use_ok('Test::Story::File') 
 };
 
 Basic_usage: {
-    ok(Test::A8N::File->meta->has_attribute('filename'), q{filename attribute});
-    ok(Test::A8N::File->meta->has_attribute('file_root'), q{file_root attribute});
-    ok(Test::A8N::File->meta->has_attribute('fixture_base'), q{fixture_base attribute});
-    ok(Test::A8N::File->meta->has_attribute('fixture_class'), q{fixture attribute});
-    ok(Test::A8N::File->meta->has_attribute('data'), q{data attribute});
-    ok(Test::A8N::File->meta->has_attribute('cases'), q{cases attribute});
+    ok(Test::Story::File->meta->has_attribute('filename'), q{filename attribute});
+    ok(Test::Story::File->meta->has_attribute('file_root'), q{file_root attribute});
+    ok(Test::Story::File->meta->has_attribute('fixture_base'), q{fixture_base attribute});
+    ok(Test::Story::File->meta->has_attribute('fixture_class'), q{fixture attribute});
+    ok(Test::Story::File->meta->has_attribute('data'), q{data attribute});
+    ok(Test::Story::File->meta->has_attribute('cases'), q{cases attribute});
 
     throws_ok(
         sub {
-            Test::A8N::File->new({
+            Test::Story::File->new({
                 filename     => 't/cases/test_doesnt_exist.tc',
                 file_root    => 't/cases',
                 parser       => 'Test::Sophos::Parser',
@@ -35,12 +35,12 @@ Basic_usage: {
 }
 
 Simple_File: {
-    my $file = Test::A8N::File->new({
+    my $file = Test::Story::File->new({
         filename     => 't/cases/test1.tc',
         file_root    => 't/cases',
         fixture_base => 'MockFixture',
     });
-    isa_ok($file, 'Test::A8N::File', q{Created File object for test1.tc});
+    isa_ok($file, 'Test::Story::File', q{Created File object for test1.tc});
     is($file->filename, 't/cases/test1.tc', q{Filename property contains valid value});
 
     my $test1 = {
@@ -58,7 +58,7 @@ Simple_File: {
     };
     is_deeply($file->data, [$test1,undef], q{YAML data returned correctly});
     is( scalar @{ $file->cases }, 1, q{cases() returns correct number of cases} );
-    isa_ok($file->cases->[0], 'Test::A8N::TestCase', q{cases() returned a Test::A8N::TestCase object});
+    isa_ok($file->cases->[0], 'Test::Story::TestCase', q{cases() returned a Test::Story::TestCase object});
     is($file->fixture_base, 'MockFixture', q{fixture_base property matches what was supplied});
     is($file->fixture_class, 'MockFixture', q{Correct fixture class located});
 
@@ -80,37 +80,37 @@ Simple_File: {
 }
 
 Files_with_spaces: {
-    my $file = Test::A8N::File->new({
+    my $file = Test::Story::File->new({
         filename     => 't/cases/test with spaces.tc',
         file_root    => 't/cases',
         fixture_base => 'MockFixture',
     });
-    isa_ok($file, 'Test::A8N::File', q{Created File object for "test with spaces.tc"});
+    isa_ok($file, 'Test::Story::File', q{Created File object for "test with spaces.tc"});
     is($file->filename, 't/cases/test with spaces.tc', q{Filename property contains valid value});
 }
 
 Files_with_different_extensions: {
-    my $file = Test::A8N::File->new({
+    my $file = Test::Story::File->new({
         filename     => 't/cases/storytest.st',
         file_root    => 't/cases',
         fixture_base => 'MockFixture',
     });
-    isa_ok($file, 'Test::A8N::File', q{Created File object for "storytest.st"});
+    isa_ok($file, 'Test::Story::File', q{Created File object for "storytest.st"});
     is($file->filename, 't/cases/storytest.st', q{Filename property contains valid value});
 }
 
 Inherited_Fixtures: {
-    my $file = Test::A8N::File->new({
+    my $file = Test::Story::File->new({
         filename     => 't/cases/UI/Config/Accounts/Alert_Recipients.tc',
         file_root    => 't/cases',
         fixture_base => 'Fixture',
     });
-    isa_ok($file, 'Test::A8N::File', q{Created File object for Alert_Recipients.tc});
+    isa_ok($file, 'Test::Story::File', q{Created File object for Alert_Recipients.tc});
     is($file->fixture_class, 'Fixture::UI::Config', q{Inherited fixture class located});
 }
 
 Fixtures_With_Spaces: {
-    my $file = Test::A8N::File->new({
+    my $file = Test::Story::File->new({
         filename     => 't/cases/System Status/Basic Status.tc',
         file_root    => 't/cases',
         fixture_base => 'Fixture',

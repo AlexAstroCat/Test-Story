@@ -7,26 +7,26 @@ use Test::More tests => 32;
 use Test::Exception;
 
 BEGIN { 
-    use_ok('Test::A8N::TestCase') 
+    use_ok('Test::Story::TestCase') 
 };
 
 Basic_usage: {
-    ok( Test::A8N::TestCase->meta->has_attribute('data'), q{data attribute}) ;
-    ok( Test::A8N::TestCase->meta->has_attribute('index'), q{index attribute}) ;
+    ok( Test::Story::TestCase->meta->has_attribute('data'), q{data attribute}) ;
+    ok( Test::Story::TestCase->meta->has_attribute('index'), q{index attribute}) ;
 
-    ok( Test::A8N::TestCase->meta->has_attribute('id'), q{id attribute}) ;
-    ok( Test::A8N::TestCase->meta->has_attribute('name'), q{name attribute}) ;
-    ok( Test::A8N::TestCase->meta->has_attribute('filename'), q{filename attribute}) ;
-    ok( Test::A8N::TestCase->meta->has_attribute('tags'), q{tags attribute}) ;
-    ok( Test::A8N::TestCase->meta->has_attribute('summary'), q{summary attribute}) ;
-    ok( Test::A8N::TestCase->meta->has_attribute('configuration'), q{configuration attribute}) ;
-    ok( Test::A8N::TestCase->meta->has_attribute('instructions'), q{instructions attribute}) ;
-    ok( Test::A8N::TestCase->meta->has_attribute('preconditions'), q{preconditions attribute}) ;
-    ok( Test::A8N::TestCase->meta->has_attribute('expected'), q{expected attribute}) ;
+    ok( Test::Story::TestCase->meta->has_attribute('id'), q{id attribute}) ;
+    ok( Test::Story::TestCase->meta->has_attribute('name'), q{name attribute}) ;
+    ok( Test::Story::TestCase->meta->has_attribute('filename'), q{filename attribute}) ;
+    ok( Test::Story::TestCase->meta->has_attribute('tags'), q{tags attribute}) ;
+    ok( Test::Story::TestCase->meta->has_attribute('summary'), q{summary attribute}) ;
+    ok( Test::Story::TestCase->meta->has_attribute('configuration'), q{configuration attribute}) ;
+    ok( Test::Story::TestCase->meta->has_attribute('instructions'), q{instructions attribute}) ;
+    ok( Test::Story::TestCase->meta->has_attribute('preconditions'), q{preconditions attribute}) ;
+    ok( Test::Story::TestCase->meta->has_attribute('expected'), q{expected attribute}) ;
 
-    ok( Test::A8N::TestCase->meta->has_attribute('test_data'), q{test_data property}) ;
+    ok( Test::Story::TestCase->meta->has_attribute('test_data'), q{test_data property}) ;
     
-    my $tc = Test::A8N::TestCase->new({
+    my $tc = Test::Story::TestCase->new({
         index => 1,
         filename => "file name",
         data => {
@@ -44,7 +44,7 @@ Basic_usage: {
             ],
         }
     });
-    isa_ok($tc, 'Test::A8N::TestCase', q{Created TestCase object});
+    isa_ok($tc, 'Test::Story::TestCase', q{Created TestCase object});
     is($tc->id, 'some_id', q{TC "ID" correct});
     is($tc->name, 'Test Name', q{TC "name" correct});
     is($tc->filename, 'file name', q{TC "filename" correct});
@@ -75,7 +75,7 @@ Basic_usage: {
 }
 
 Implicit_IDs: {
-    my $tc = Test::A8N::TestCase->new({
+    my $tc = Test::Story::TestCase->new({
         index => 1,
         filename => "file name",
         data => {
@@ -93,7 +93,7 @@ Implicit_IDs: {
 }
 
 Parse_Data: {
-    my $tc = Test::A8N::TestCase->new({
+    my $tc = Test::Story::TestCase->new({
         index => 1,
         filename => "file name",
         data => {
@@ -137,7 +137,7 @@ Parse_Data: {
 }
 
 Preconditions: {
-    my $tc = Test::A8N::TestCase->new({
+    my $tc = Test::Story::TestCase->new({
         index => 1,
         filename => "file name",
         data => {
@@ -170,7 +170,7 @@ Preconditions: {
 }
 
 Test_Munger: {
-    my $tc = Test::A8N::TestCase->new({
+    my $tc = Test::Story::TestCase->new({
         index => 1,
         filename => "file name",
         data => {

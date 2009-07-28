@@ -36,20 +36,20 @@ function! TCFoldTestCase()
     let i = 1
     let lines = v:foldend - v:foldstart + 1
     let pretty = v:folddashes . lines . ' lines: '
-    let a8n = ''
+    let story = ''
     let name = '???'
     while i <= 1000
 	let line = getline(v:foldstart + i)
         if match(line, "^--*$") != -1
-            return pretty . a8n . name
+            return pretty . story . name
         elseif match(line, "^{{{") != -1
-	    let a8n = "[A8N] "
+	    let story = "[story] "
 	elseif match(line, 'NAME:') != -1
 	    let name = substitute(line, '.*NAME:', '', '')
 	endif
 	let i = i + 1
     endwhile
-    return pretty . a8n . name
+    return pretty . story . name
 endfunction
 
 "map <C-h> <ESC>:execute '!fixturedoc --filename="' . expand("%") . '" --line=' . line(".")<CR>
