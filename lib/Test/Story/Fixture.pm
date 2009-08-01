@@ -11,11 +11,8 @@ BEGIN {
 use Test::More;
 use YAML::Syck;
 use File::Temp qw(tempfile);
-use WWW::Selenium;
-use Test::Story::VMWare;
 our @EXCLUDE_METHODS = qw(
     config
-    selenium
     testcase
     ctxt
     verbose
@@ -39,9 +36,6 @@ sub BUILD {
 
 sub DEMOLISH {
     my $self = shift;
-    if (exists $self->ctxt->{selenium}) {
-        $self->ctxt->{selenium}->stop();
-    }
     diag "FINISH: " . $self->testcase->id
         if ($self->verbose);
 }
@@ -75,30 +69,9 @@ has 'config' => (
     }
 );
 
-has 'vmware' => (
-    is => 'ro',
-    required => 1,
-    isa => 'Object',
-    lazy => 1,
-    default => sub { 
-        my $self = shift;
-        my $config = $self->config->{selenium}->{"virtual machine"};
-        return undef unless($config);
-        return Test::Story::VMWare->new({ config => $config });
-    },
-);
-
 has 'testcase' => (
     is => 'rw',
     isa => 'Object'
-);
-
-has 'selenium_class' => (
-    is => 'rw',
-    required => 1,
-    isa => 'Str',
-    default => sub { "WWW::Selenium"; },
-    lazy => 1,
 );
 
 has 'ctxt' => (
@@ -114,14 +87,6 @@ has verbose => (
     required    => 0,
     isa         => q{Bool}
 );
-
-sub page_mapping {
-    my $self = shift;
-    my ($url) = @_;
-    my $base = $self->_get_metavar('selenium.browser_url');
-    $base =~ s/\/$//;
-    return "$base$url";
-}
 
 # NB: this is a FITesque method, please do not edit.
 sub parse_method_string {
@@ -159,44 +124,6 @@ sub parse_method_string {
 sub disallowed_phrases {
   my ($self) = @_;
   return qw();
-}
-
-sub selenium {
-    my $self = shift;
-
-    return $self->ctxt->{selenium}
-        if (exists $self->ctxt->{selenium});
-
-    if (exists $self->config->{selenium}->{"virtual machine"}) {
-        my $vm = $self->vmware;
-        if ($vm) {
-            $vm->start if (!$vm->is_running);
-            if (!$self->_get_metavar('selenium.server')) {
-                $self->config->{selenium}{server} = $vm->guest_ip;
-            }
-        }
-    }
-
-    my %args = (
-        host => $self->_get_metavar('selenium.server'),
-        port => $self->_get_metavar('selenium.port'),
-        browser => $self->_get_metavar('selenium.browser'),
-        browser_url => $self->_get_metavar('selenium.browser_url'),
-    );
-
-    foreach my $key (keys %args) {
-        delete $args{$key} unless ($args{$key});
-    }
-
-    $args{browser} = "*$args{browser}" if (exists $args{browser});
-
-    # Create, save and return a selenium object for this appliance
-    my $class = $self->selenium_class;
-    eval "use $class;";
-    die "$@\n" if $@;
-    $self->ctxt->{selenium} = $class->new( %args );
-    $self->ctxt->{selenium}->start();
-    return $self->ctxt->{selenium};
 }
 
 sub _get_metavar {
@@ -307,32 +234,6 @@ sub todo_fail {
         fail($arg);
     }
 }
-
-=head2 goto page
-
-  goto page: /some/url
-  goto page: PageName
-
-Sets the current browser context to a page, either using the absolute path supplied, or
-using an abstract page name as defined by the page_mapping hash.  Either set this at run-time,
-or override it in a subclass.
-
-=cut
-
-sub goto_page {
-    my $self = shift;
-    my ($page) = @_;
-
-    $self->selenium->open( $self->page_mapping($page) );
-}
-
-sub ensure_testing_environment_is_in_a_consistent_state {
-    my $self = shift;
-    if ($self->vmware->is_valid) {
-        $self->vmware->revertSnapshot();
-    }
-}
-
 
 1;
 __END__

@@ -1,10 +1,35 @@
-package Test::Story::VMWare;
+package Test::Story::Fixture::VMWare;
 
-use Moose;
-use lib 't/lib';
+use warnings;
+use strict;
+
+use Moose::Role;
 use VMware::Vix::Simple;
 use VMware::Vix::API::Constants;
 use File::Temp qw( tempfile );
+
+our $VERSION = 0.01;
+
+our @EXCLUDE_METHODS = qw(
+    selenium
+    vmware
+    is_valid 
+    is_connected 
+    hostname
+    port
+    server_username
+    server_password
+    cfg_path
+    server_handle
+    vm_handle
+    num_snapshots 
+    revertSnapshot 
+    vm_names 
+    is_running 
+    start 
+    guest_ip
+);
+
 
 sub BUILD {
     my $self = shift;
@@ -35,11 +60,6 @@ has 'is_connected' => (
     isa => 'Bool',
 );
 
-has 'config' => (
-    is => 'rw',
-    isa => 'HashRef',
-);
-
 has 'hostname' => (
     is => 'ro',
     required => 1,
@@ -53,6 +73,7 @@ has 'hostname' => (
         return $host;
     }
 );
+
 has 'port' => (
     is => 'ro',
     required => 1,
@@ -66,6 +87,7 @@ has 'port' => (
         return $port || 902;
     }
 );
+
 has 'server_username' => (
     is => 'ro',
     required => 1,
@@ -76,6 +98,7 @@ has 'server_username' => (
         return $self->config->{server_username} || "";
     }
 );
+
 has 'server_password' => (
     is => 'ro',
     required => 1,
@@ -86,6 +109,7 @@ has 'server_password' => (
         return $self->config->{server_password} || "";
     }
 );
+
 has 'cfg_path' => (
     is => 'ro',
     required => 1,
@@ -223,12 +247,57 @@ has 'guest_ip' => (
     },
 );
 
+sub selenium {
+    if ( $self->DOES("Selenium") ) {
+        if (exists $self->config->{selenium}->{"virtual machine"}) {
+            my $vm = $self->vmware;
+            if ($vm) {
+                $vm->start if (!$vm->is_running);
+                if (!$self->_get_metavar('selenium.server')) {
+                    $self->config->{selenium}{server} = $vm->guest_ip;
+                }
+            }
+        }
+    }
+}
+
+has 'vmware' => (
+    is => 'ro',
+    required => 1,
+    isa => 'Object',
+    lazy => 1,
+    default => sub { 
+        my $self = shift;
+        my $config = $self->config->{selenium}->{"virtual machine"};
+        return undef unless($config);
+        return Test::Story::VMWare->new({ config => $config });
+    },
+);
+
+sub ensure_testing_environment_is_in_a_consistent_state {
+    my $self = shift;
+    if ($self->vmware->is_valid) {
+        $self->vmware->revertSnapshot();
+    }
+}
+
+
 1;
 __END__
 
+
 =head1 SEE ALSO
 
-L<VMware::Vix::Simple>
+=over 4
 
-=cut
+=item *
+
+L<Test::Story::Fixture>
+
+=item *
+
+L<VMWare::Vix::Simple>
+
+=back
+
 
