@@ -1,0 +1,10 @@
+*.sw[a-z]
+META.yml
+Makefile
+Makefile.old
+MANIFEST.bak
+Test-Story-*.tar.gz
+blib/
+inc/
+cover_db/
+pm_to_blib
