@@ -84,7 +84,7 @@ sub process_module {
     warn "Processing $package\n" if ($verbose);
     eval "use $package;";
 
-    return if ($package eq 'Test::A8N::Fixture');
+    return if ($package eq 'Test::Story::Fixture');
     my @isa = @{$package . "::ISA"};
     foreach my $base (@isa) {
         next if (exists($PROCESSED_PACKAGES{$base}));

@@ -1,6 +1,5 @@
----
-NAME: Test Case 1
-ID: some_test_case_1
+NAME: Story test
+ID: storytest
 
 SUMMARY: This is a test summary
 

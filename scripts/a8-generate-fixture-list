@@ -22,11 +22,13 @@ die "Must provide fixture_base in ~/.a8rc!\n" unless $fixture_base;
 my $fixture_base_path = $fixture_base;
 $fixture_base_path =~ s#::#/#g;
 
-my @INC_DIRECTORIES = grep { -d $_ } @INC;
+my @INC_DIRECTORIES = grep { -d $_ } ($config->{fixture_root}, @INC);
 my %PROCESSED_PACKAGES = ();
 my @FILES = ();
 my %METHODS = ();
 my @PACKAGES = ($fixture_base);
+
+warn "Looking for packages in:\n" . join("\n", @INC_DIRECTORIES) . "\n" if ($verbose);
 
 my $want_child_classes = sub {
     my $filename = $File::Find::name;
@@ -66,10 +68,15 @@ sub process_module {
     my @ctags_output = <$fh>;
     close $fh;
 
+    my ($col_type, $col_name) = (3, 0);
+    if (`ctags --version` =~ /Exuberant Ctags/i) {
+        ($col_type, $col_name) = (1, 0);
+    }
+
     foreach my $line (@ctags_output) {
         my @columns = split(/\s+/, $line);
-        next if ($columns[1] ne 'subroutine');
-        my $sub = $columns[0];
+        next if ($columns[$col_type] !~ 'sub');
+        my ($sub) = $columns[$col_name] =~ /([^:]+)$/;
         next if ($sub =~ /^_/);
         next if ($sub =~ /[A-Z]/);
         next if (grep /\b$sub\b/, @{$package . "::EXCLUDE_METHODS"});
@@ -77,7 +84,7 @@ sub process_module {
         $type = "test" if ($line =~ /$sub\s*:\s*Test/);
         $METHODS{$sub} = $type;
     }
-    return if ($package eq 'Test::A8N::Fixture');
+    return if ($package eq 'Test::Story::Fixture');
     my @isa = @{$package . "::ISA"};
     foreach my $base (@isa) {
         next if (exists($PROCESSED_PACKAGES{$base}));

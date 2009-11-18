@@ -1,8 +1,11 @@
-package Fixture::System_Status;
+package Fixture::SystemStatus;
 
 use strict;
 use warnings;
-use base qw(Fixture);
+use Moose;
+BEGIN {
+    extends 'Fixture';
+}
 use Test::More;
 
 sub systemstatus : Test {

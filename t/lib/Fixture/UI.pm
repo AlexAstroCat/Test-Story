@@ -2,7 +2,10 @@ package Fixture::UI;
 
 use strict;
 use warnings;
-use base qw(Fixture);
+use Moose;
+BEGIN {
+    extends 'Fixture';
+}
 use Test::More;
 
 sub ui_test1 : Test {

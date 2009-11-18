@@ -2,7 +2,10 @@ package Fixture::UI::Config;
 
 use strict;
 use warnings;
-use base qw(Fixture::UI);
+use Moose;
+BEGIN {
+    extends 'Fixture';
+}
 use Test::More;
 
 sub config_test1 : Test {

@@ -3,12 +3,23 @@
 use strict;
 use warnings;
 
-use Test::More tests => 32;
+use Test::More tests => 45;
 use Test::Exception;
 
 BEGIN { 
     use_ok('Test::Story::TestCase') 
 };
+my %config_defaults = (
+    fixture_base       => "Fixture",
+    file_root          => "t/testdata/cases",
+    filenames          => [],
+    verbose            => 0,
+    tags         => {
+        include => [],
+        exclude => [],
+    },
+    allowed_extensions => [qw( tc st )],
+);
 
 Basic_usage: {
     ok( Test::Story::TestCase->meta->has_attribute('data'), q{data attribute}) ;
@@ -24,6 +35,7 @@ Basic_usage: {
     ok( Test::Story::TestCase->meta->has_attribute('preconditions'), q{preconditions attribute}) ;
     ok( Test::Story::TestCase->meta->has_attribute('expected'), q{expected attribute}) ;
 
+    ok( Test::Story::TestCase->meta->has_attribute('is_valid'), q{is_valid property}) ;
     ok( Test::Story::TestCase->meta->has_attribute('test_data'), q{test_data property}) ;
     
     my $tc = Test::Story::TestCase->new({
@@ -33,24 +45,34 @@ Basic_usage: {
             ID => "some_id",
             NAME => "Test Name",
             SUMMARY => "Summary Test Description",
-            TAGS => [qw( tag1 tag2 )],
-            CONFIGURATION => [qw( foo bar )],
-	    EXPECTED => [qw(expected1 expected2)],
+            TAGS => [qw( tag1 Tag2 )],
+            EXPECTED => [qw(expected1 expected2)],
             INSTRUCTIONS => [
                 'fixture1',
                 { 'fixture2' => 'foo' },
                 { 'fixture3' => { 'bar' => 'baz' } },
                 { 'fixture4' => [ 'boo', 'bork' ] }
             ],
-        }
+        },
+        config => \%config_defaults,
     });
     isa_ok($tc, 'Test::Story::TestCase', q{Created TestCase object});
+    ok($tc->is_valid, q{TC is valid});
     is($tc->id, 'some_id', q{TC "ID" correct});
     is($tc->name, 'Test Name', q{TC "name" correct});
     is($tc->filename, 'file name', q{TC "filename" correct});
     is($tc->summary, 'Summary Test Description', q{TC "summary" correct});
-    is_deeply($tc->configuration, [qw( foo bar )], q{TC "configuration" list});
+
     is_deeply($tc->tags, [qw( tag1 tag2 )], q{TC "tags" correct});
+    ok($tc->hasTags(), q{hasTags defaults to true});
+    ok($tc->hasTags(qw( tag1 tag2 )), q{hasTags tag1, tag2});
+    ok($tc->hasTags(qw( tag1 )), q{hasTags tag1});
+    ok($tc->hasTags(qw( tag2 )), q{hasTags tag2});
+    ok(!$tc->hasTags(qw( foo )), q{doesn't hasTags foo});
+    ok(!$tc->hasTags(qw( tag1 foo )), q{doesn't hasTags tag1, foo});
+    ok(!$tc->hasTags(qw( tag2 foo )), q{doesn't hasTags tag2, foo});
+    ok(!$tc->hasTags(qw( tag1 tag2 foo )), q{doesn't hasTags tag1, tag2, foo});
+
     is_deeply($tc->expected, [qw( expected1 expected2 )], q{TC "expected" correct});
     is_deeply(
         $tc->instructions,
@@ -74,6 +96,62 @@ Basic_usage: {
     );
 }
 
+Invalid_TC: {
+    my $tc = Test::Story::TestCase->new({
+        index => 1,
+        filename => "file name",
+        data => {
+            NAME => "Test Name",
+        },
+        config => {
+            %config_defaults
+        }
+    });
+    ok(!$tc->is_valid, q{TC is not valid});
+}
+
+Invalid_Configuration: {
+    my $tc;
+    throws_ok {
+        $tc = Test::Story::TestCase->new({
+            index => 1,
+            filename => "file name",
+            data => {
+                NAME => "Test Name",
+                CONFIGURATION => [qw( foo )],
+            },
+            config => {
+                %config_defaults
+            }
+        });
+    } qr{Can't load configuration file "t/testdata/cases/foo" for testcase "Test Name" in file "file name"}, "bad config file throws an exception";
+}
+
+Good_Configuration: {
+    my $tc;
+    lives_ok {
+        $tc = Test::Story::TestCase->new({
+            index => 1,
+            filename => "file name",
+            data => {
+                NAME => "Test Name",
+                CONFIGURATION => [qw( UI/Config/Accounts/Alert_Recipients.conf )],
+            },
+            config => {
+                %config_defaults
+            }
+        });
+    } "testcase loads with config data";
+    is_deeply(
+        $tc->config,
+        {
+            %config_defaults,
+            alert => ['bob@foo.org']
+        },
+        q{testcase config data loaded}
+    );
+}
+
 Implicit_IDs: {
     my $tc = Test::Story::TestCase->new({
         index => 1,
@@ -87,6 +165,9 @@ Implicit_IDs: {
                 { 'some other test' => [] },
                 { 'some final test' => [] },
             ],
+        },
+        config => {
+            %config_defaults
         }
     });
     is($tc->id, 'test_name', q{Implied test ID works});
@@ -103,6 +184,9 @@ Parse_Data: {
             INSTRUCTIONS => [
                 { 'some test' => [] },
             ],
+        },
+        config => {
+            %config_defaults
         }
     });
     is_deeply(
@@ -150,6 +234,9 @@ Preconditions: {
             INSTRUCTIONS => [
                 { 'some test' => 'b' },
             ],
+        },
+        config => {
+            %config_defaults
         }
     });
     is_deeply(
@@ -180,6 +267,9 @@ Test_Munger: {
             INSTRUCTIONS => [
                 { 'some test' => [] },
             ],
+        },
+        config => {
+            %config_defaults
         }
     });
 }

@@ -1,4 +1,6 @@
 package Test::Story::Fixture;
+use warnings;
+use strict;
 
 use Moose;
 
@@ -10,13 +12,12 @@ BEGIN {
 
 use Test::More;
 use YAML::Syck;
-use File::Temp qw(tempfile);
 our @EXCLUDE_METHODS = qw(
     config
+    selenium
     testcase
     ctxt
     verbose
-    page_mapping
     parse_method_string
     disallowed_phrases
     parse_arguments
@@ -29,44 +30,39 @@ sub BUILD {
         Test::Builder->new->no_diag(1);
     }
     diag sprintf(q{Using fixture class "%s"}, blessed($self))
-        if ($self->verbose);
-    diag "START: " . $self->testcase->id
+        if ($self->verbose > 1);
+    diag sprintf('START: "%s": %s', $self->testcase->filename, $self->testcase->id)
         if ($self->verbose);
 }
 
 sub DEMOLISH {
     my $self = shift;
-    diag "FINISH: " . $self->testcase->id
+    # fixture actions can clean up after themselves
+    while (my $coderef = shift @{ $self->_demolish_actions() }){
+        $self->$coderef();
+        $coderef = undef;
+    }
+    diag sprintf('FINISH: "%s": %s', $self->testcase->filename, $self->testcase->id)
         if ($self->verbose);
 }
 
+has '_demolish_actions' => (
+    is      => 'ro',
+    isa     => 'ArrayRef',
+    default => sub {[]},
+);
+
+sub _add_demolish_actions {
+    my ($self, @actions) = @_;
+    push @{ $self->_demolish_actions() }, @actions;
+}
+
 has 'config' => (
-    is => 'ro',
+    is => 'rw',
     required => 1,
     isa => 'HashRef',
+    default => sub { shift->testcase->config },
     lazy => 1,
-    default => sub {
-        my $self = shift;
-        my %user_config = ();
-
-        my $tc_config = $self->testcase->configuration;
-        my @config_files = @{ $tc_config };
-
-        my $file_config = $self->testcase->filename;
-        $file_config =~ s/\.st$/.conf/;
-        push @config_files, $file_config
-           if (-f $file_config);
-
-        push @config_files, glob('~/.a8rc');
-
-        while (my $config = shift @config_files) {
-            my $config_data = LoadFile($config);
-            die "Configuration $config is not a hash"
-                unless (ref($config_data) eq 'HASH');
-            %user_config = (%user_config, %$config_data);
-        }
-        return \%user_config;
-    }
 );
 
 has 'testcase' => (
@@ -83,9 +79,11 @@ has 'ctxt' => (
 );
 
 has verbose => (
-    is          => q{rw},
-    required    => 0,
-    isa         => q{Bool}
+    required => 1,
+    lazy     => 1,
+    is       => q{ro},
+    isa      => q{Int},
+    default  => sub { return shift->config->{verbose} },
 );
 
 # NB: this is a FITesque method, please do not edit.
@@ -99,7 +97,7 @@ sub parse_method_string {
     return undef;
   }
 
-  if (ref($self) and $self->verbose) {
+  if (ref($self) and $self->verbose > 1) {
       diag "Fixture method $method_name";
   }
 

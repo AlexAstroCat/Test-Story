@@ -1,7 +1,7 @@
-NAME: Basic Status
-ID: basic_status
+NAME: Report Dashboard
+ID: report_dashboard
 
-SUMMARY: Basic system status view
+SUMMARY: Admin views report dashboard
 
 TAGS:
     - tag1
