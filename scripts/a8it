@@ -12,6 +12,7 @@ my $home = $ENV{HOME};
 my $config_path;
 
 our @allowed_extensions;
+our @include_path;
 our $verbose;
 our $version = 0;
 our $help = 0;
@@ -27,6 +28,7 @@ GetOptions(
     'list'             => \$list,
     'b|fixture_base=s' => \$fixture_base,
     'r|file_root=s'    => \$file_root,
+    'I|include=s'      => \@include_path,
     'config=s'         => \$config_path,
     'tag=s'            => \@tags,
     'extension=s'      => \@allowed_extensions,
@@ -34,6 +36,8 @@ GetOptions(
 ) or usage();
 usage() if $help;
 version() if $version;
+
+unshift @INC, @include_path;
 
 if (defined($config_path) and !-f $config_path) {
     warn "Can't find specified config file \"$config_path\"\n";
@@ -148,6 +152,10 @@ This permits you to customize which extension, or extensions, you wish to run wi
 =item -l | --list 
 
 List the test files and case IDs that will be run, but don't actually run the tests.
+
+=item -I | --include E<lt>pathE<gt>
+
+Perl include path to use when running tests.  You can specify this multiple times to include multiple directories.
 
 =item -v | --verbose
 
