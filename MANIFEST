@@ -20,7 +20,6 @@ lib/Test/Story/Tutorial.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.yml
 README
 scripts/storytest
 scripts/storytest-fixturedoc
@@ -28,7 +27,6 @@ t/00_pod.t
 t/01_fixup.t
 t/02_testcase.t
 t/03_file.t
-t/04_a8n.t
 t/04_story.t
 t/05_storytest.t
 t/cases/invalid_syntax.tc
