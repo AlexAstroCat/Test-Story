@@ -1,4 +1,4 @@
-Revision history for Test::A8N
+Revision history for Test::Story
 
 0.01 - Sat Mar 29 14:39:00 PDT 2008
     - First release to CPAN
@@ -26,3 +26,6 @@ Revision history for Test::A8N
 
 0.06 - Thu Sep  4 11:58:41 PDT 2008
     - Made exclude-tags OR tags together, instead of ANDing them
+
+0.07 - Tue Aug 17 12:27:42 PDT 2010
+    - Renamed Test::A8N -> Test::Story, by popular request
