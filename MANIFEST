@@ -1,6 +1,15 @@
 .vim/filetype.vim
 .vim/syntax/storytest.vim
 Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Scripts.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
 lib/Test/Story.pm
 lib/Test/Story/File.pm
 lib/Test/Story/Fixture.pm
@@ -10,15 +19,17 @@ lib/Test/Story/TestCase.pm
 lib/Test/Story/Tutorial.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
 README
-scripts/a8-fixturedoc
-scripts/a8-generate-fixture-list
 scripts/storytest
+scripts/storytest-fixturedoc
 t/00_pod.t
 t/01_fixup.t
 t/02_testcase.t
 t/03_file.t
 t/04_a8n.t
+t/04_story.t
 t/05_storytest.t
 t/cases/invalid_syntax.tc
 t/cases/storytest.st
@@ -40,13 +51,4 @@ t/lib/MockFixture.pm
 t/mock/Test/FITesque/Suite.pm
 t/mock/Test/FITesque/Test.pm
 t/mock/Test/MockBuilder.pm
-t/testdata/cases/invalid_syntax.tc
-t/testdata/cases/storytest.st
-'t/testdata/cases/System Status/Basic Status.tc'
-'t/testdata/cases/test with spaces.tc'
-t/testdata/cases/test1.tc
-t/testdata/cases/test_multiple.st
-t/testdata/cases/UI/Config/Accounts/Alert_Recipients.conf
-t/testdata/cases/UI/Config/Accounts/Alert_Recipients.tc
-t/testdata/cases/UI/Config/Certificates/Views_Root_CA.tc
-t/testdata/cases/UI/Reports/Report_Dashboard.tc
+tools/storytest-genfixturelist
