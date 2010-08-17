@@ -1,23 +1,22 @@
-use ExtUtils::MakeMaker;
-WriteMakefile(
-    NAME              => 'Test::Story',
-    VERSION_FROM      => 'lib/Test/Story.pm',
-    EXE_FILES         => [glob("scripts/*")],
-    LICENSE           => 'perl',
-    PREREQ_PM         => {
-        'Test::FITesque' => '0.03',
-        'Test::Deep'     => 0,
-        'Moose'          => '0.33',
-        'File::Find'     => 0,
-        'YAML'           => 0,
-        'Module::Load'   => 0,
-        'Pod::Usage'     => 0,
-        'File::Find'     => 0,
-        'Test::Builder'  => 0,
-        'Test::More'     => 0,
-        'WWW::Selenium'  => 0,
-    },
-    ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM  => 'lib/Test/Story.pm', # retrieve abstract from module
-       AUTHOR         => 'Michael Nachbaur <mike@nachbaur.com>') : ()),
-);
+#!/usr/bin/env perl
+# IMPORTANT: if you delete this file your app will not work as
+# expected.  You have been warned.
+use inc::Module::Install;
+
+name 'Test-Story';
+all_from 'lib/Test/Story.pm';
+
+requires 'Test::FITesque' => '0.03';
+requires 'Test::Deep'     => 0;
+requires 'Moose'          => '0.33';
+requires 'File::Find'     => 0;
+requires 'YAML'           => 0;
+requires 'Module::Load'   => 0;
+requires 'Pod::Usage'     => 0;
+requires 'File::Find'     => 0;
+requires 'Test::Builder'  => 0;
+requires 'Test::More'     => 0;
+requires 'WWW::Selenium'  => 0;
+
+install_script glob('script/*');
+WriteAll;
