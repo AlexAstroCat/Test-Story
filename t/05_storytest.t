@@ -4,8 +4,8 @@ use strict;
 use warnings;
 
 use Test::More;
-if (-f glob("~/.a8rc")) {
-    plan(skip_all => "you can't run storytest unit tests if a ~/.a8rc file exists");
+if (-f glob("~/.storytestrc")) {
+    plan(skip_all => "you can't run storytest unit tests if a ~/.storytestrc file exists");
 } else {
     plan(tests => 38);
 }

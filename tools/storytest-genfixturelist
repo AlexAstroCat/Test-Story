@@ -13,12 +13,12 @@ GetOptions(
 
 our $config = {};
 my $home = $ENV{HOME};
-if (-f "$home/.a8rc") {
-    $config = LoadFile("$home/.a8rc");
+if (-f "$home/.storytestrc") {
+    $config = LoadFile("$home/.storytestrc");
 }
 
 my $fixture_base = $config->{fixture_base};
-die "Must provide fixture_base in ~/.a8rc!\n" unless $fixture_base;
+die "Must provide fixture_base in ~/.storytestrc!\n" unless $fixture_base;
 my $fixture_base_path = $fixture_base;
 $fixture_base_path =~ s#::#/#g;
 

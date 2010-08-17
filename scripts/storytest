@@ -43,7 +43,7 @@ if (defined($config_path) and !-f $config_path) {
     warn "Can't find specified config file \"$config_path\"\n";
     usage();
 }
-$config_path ||= glob("$home/.a8rc");
+$config_path ||= glob("$home/.storytestrc");
 if (defined($config_path) and -r $config_path) {
     $config = LoadFile($config_path);
 }
@@ -114,7 +114,7 @@ This utility can be run in a number of fashions, each targeted at your specific 
 
 =item -c | --config E<lt>filenameE<gt>
 
-The filename where your automation configuration data is stored.  Defaults to F<~/.a8rc>.
+The filename where your automation configuration data is stored.  Defaults to F<~/.storytestrc>.
 
 =item -b | --fixture_base E<lt>baseE<gt>
 
