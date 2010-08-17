@@ -29,3 +29,4 @@ Revision history for Test::Story
 
 0.07 - Tue Aug 17 12:27:42 PDT 2010
     - Renamed Test::A8N -> Test::Story, by popular request
+    - Switch to YAML from YAML::Syck

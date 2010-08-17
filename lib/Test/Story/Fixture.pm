@@ -1,7 +1,4 @@
 package Test::Story::Fixture;
-use warnings;
-use strict;
-
 use Moose;
 
 BEGIN {
@@ -11,7 +8,6 @@ BEGIN {
 }
 
 use Test::More;
-use YAML::Syck;
 our @EXCLUDE_METHODS = qw(
     config
     selenium

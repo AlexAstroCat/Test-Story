@@ -9,7 +9,7 @@ WriteMakefile(
         'Test::Deep'     => 0,
         'Moose'          => '0.33',
         'File::Find'     => 0,
-        'YAML::Syck'     => '0.94',
+        'YAML'           => 0,
         'Module::Load'   => 0,
         'Pod::Usage'     => 0,
         'File::Find'     => 0,

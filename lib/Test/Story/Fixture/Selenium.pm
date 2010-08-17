@@ -1,7 +1,4 @@
 package Test::Story::Fixture::Selenium;
-use warnings;
-use strict;
-
 use Moose::Role;
 use WWW::Selenium;
 our @EXCLUDE_METHODS = qw(

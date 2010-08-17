@@ -11,5 +11,5 @@ INSTRUCTIONS:
     - fixture1
     - fixture2
 
-EXPECTED:
+EXPECTED: >
     Some output

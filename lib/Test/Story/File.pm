@@ -1,10 +1,6 @@
 package Test::Story::File;
-use warnings;
-use strict;
-
-# NB: Moose also enforces 'strict' and warnings;
 use Moose;
-use YAML::Syck;
+use YAML qw(LoadFile);
 use Test::Story::TestCase;
 use Module::Load;
 use Storable qw(dclone);

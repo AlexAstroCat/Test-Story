@@ -1,8 +1,4 @@
 package Test::Story::Fixture::VMWare;
-
-use warnings;
-use strict;
-
 use Moose::Role;
 use VMware::Vix::Simple;
 use VMware::Vix::API::Constants;

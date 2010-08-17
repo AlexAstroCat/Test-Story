@@ -1,8 +1,4 @@
 package Test::Story;
-use warnings;
-use strict;
-
-# NB: Moose also enforces 'strict' and warnings;
 use Moose;
 use Test::FITesque::Suite;
 use Test::FITesque::Test;
@@ -10,7 +6,7 @@ use Test::Story::File;
 use File::Find;
 use Storable qw(dclone);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub BUILD {
     my $self = shift;

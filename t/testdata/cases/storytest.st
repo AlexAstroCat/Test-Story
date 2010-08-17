@@ -16,5 +16,5 @@ INSTRUCTIONS:
         - boo
         - bork
 
-EXPECTED:
+EXPECTED: >
     Some output

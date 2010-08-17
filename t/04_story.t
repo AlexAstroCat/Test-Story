@@ -204,7 +204,7 @@ Multiple_Tests: {
         {
           'SUMMARY' => 'This is a test summary',
           'NAME' => 'Test Case 1',
-          'EXPECTED' => 'Some output',
+          'EXPECTED' => "Some output\n",
           'INSTRUCTIONS' => [
                               'fixture1',
                               {
@@ -232,7 +232,7 @@ Multiple_Tests: {
           'SUMMARY' => 'This is a test summary',
           'ID' => 'custom_id',
           'NAME' => 'Test Case 2',
-          'EXPECTED' => 'Some output',
+          'EXPECTED' => "Some output\n",
           'INSTRUCTIONS' => [
                               'fixture1',
                               { 'fixture2' => 'foo' },
@@ -249,7 +249,7 @@ Multiple_Tests: {
           'ID' => 'some_other_id',
           'SUMMARY' => 'This is a test summary',
           'NAME' => 'Test Case 3',
-          'EXPECTED' => 'Some output',
+          'EXPECTED' => "Some output\n",
           'INSTRUCTIONS' => [
                               'fixture1',
                               { 'fixture2' => 'foo' },

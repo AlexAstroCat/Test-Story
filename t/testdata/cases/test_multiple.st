@@ -1,4 +1,4 @@
-#!/usr/bin/env scripts/a8it --config=t/data/config2
+#!/usr/bin/env scripts/storytest --config=t/data/config2
 NAME: Test Case 1
 
 SUMMARY: This is a test summary
@@ -16,7 +16,7 @@ INSTRUCTIONS:
         - boo
         - bork
 
-EXPECTED:
+EXPECTED: >
     Some output
 ---
 NAME: Test Case 2
@@ -36,7 +36,7 @@ INSTRUCTIONS:
         - boo
         - bork
 
-EXPECTED:
+EXPECTED: >
     Some output
 ---
 NAME: Test Case 3
@@ -57,5 +57,5 @@ INSTRUCTIONS:
 
 ID: some_other_id
 
-EXPECTED:
+EXPECTED: >
     Some output

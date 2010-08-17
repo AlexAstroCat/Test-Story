@@ -5,14 +5,14 @@ use warnings;
 
 use Test::More;
 if (-f glob("~/.a8rc")) {
-    plan(skip_all => "you can't run a8it unit tests if a ~/.a8rc file exists");
+    plan(skip_all => "you can't run storytest unit tests if a ~/.a8rc file exists");
 } else {
     plan(tests => 38);
 }
 
-my $a8it = "$^X -Iblib -It/lib scripts/a8it %s 2>&1";
+my $storytest = "$^X -Iblib -It/lib scripts/storytest %s 2>&1";
 sub runcmd {
-    my $cmd = sprintf($a8it, @_);
+    my $cmd = sprintf($storytest, @_);
     return `$cmd`;
 }
 sub generate_tap {
@@ -35,7 +35,7 @@ DashDash_help: {
 DashDash_version: {
     my $output;
     $output = runcmd("--version");
-    ok($output =~ /^a8it version /, "--version info");
+    ok($output =~ /^storytest version /, "--version info");
 }
 
 DashDash_file_root: {

@@ -5,7 +5,7 @@ use lib qw( t/lib blib lib );
 use Test::Story;
 use Getopt::Long;
 use Pod::Usage;
-use YAML::Syck;
+use YAML qw(LoadFile);
 
 our $config = {};
 my $home = $ENV{HOME};
@@ -85,7 +85,7 @@ sub usage {
 }
 
 sub version {
-    print "a8it version " . $Test::Story::VERSION . "\n";
+    print "storytest version " . $Test::Story::VERSION . "\n";
     exit 2;
 }
 
@@ -93,17 +93,17 @@ __END__
 
 =head1 NAME
 
-a8it - Story-test testcase script automation runner
+storytest - Story-test testcase script automation runner
 
 =head1 SYNOPSIS
 
- a8it [-c <config>] [-b <base fixture class>] [-r <test root>] [<file>...]
+ storytest [-c <config>] [-b <base fixture class>] [-r <test root>] [<file>...]
 
- Use `perldoc a8it' for more help documentation.
+ Use `perldoc storytest' for more help documentation.
 
 =head1 DESCRIPTION
 
-a8it is the command-line utility for L<Test::Story>, which allows you to run automated story test cases to perform system and live-site automation checks for
+storytest is the command-line utility for L<Test::Story>, which allows you to run automated story test cases to perform system and live-site automation checks for
 quality assurance and test purposes.
 
 This utility can be run in a number of fashions, each targeted at your specific use
@@ -130,13 +130,13 @@ The name of a tag that you wish to search for to limit which test cases you run.
 can specify this command multiple times to indicate multiple tags, or you can separate
 them by commas.  For instance:
 
-    a8it -t smoke -t email
-    a8it -t smoke,email
+    storytest -t smoke -t email
+    storytest -t smoke,email
 
 Additionally, if a tag begins with a bang (!) then it is considered a tag exclusion.  In
 this case, only cases that do not contain the tag will be run.  For example:
 
-    a8it -t smoke -t !manual
+    storytest -t smoke -t !manual
 
 will run all smoke tests that do not have the "manual" tag.
 

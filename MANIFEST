@@ -13,15 +13,13 @@ MANIFEST			This list of files
 README
 scripts/a8-fixturedoc
 scripts/a8-generate-fixture-list
-scripts/a8-validate
-scripts/a8-validate-all
-scripts/a8it
+scripts/storytest
 t/00_pod.t
 t/01_fixup.t
 t/02_testcase.t
 t/03_file.t
 t/04_a8n.t
-t/05_a8it.t
+t/05_storytest.t
 t/cases/invalid_syntax.tc
 t/cases/storytest.st
 t/cases/System__Status/Basic__Status.tc

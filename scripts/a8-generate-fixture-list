@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use YAML::Syck;
+use YAML qw(LoadFile);
 use File::Find;
 use Getopt::Long;
 use lib qw( t/lib lib );

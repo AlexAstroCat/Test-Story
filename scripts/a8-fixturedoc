@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-use YAML::Syck;
+use YAML qw(LoadFile);
 use File::Find;
 use Getopt::Long;
 use Pod::Select;

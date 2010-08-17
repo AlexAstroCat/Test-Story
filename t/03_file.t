@@ -72,7 +72,7 @@ Simple_File: {
             { 'fixture3' => { 'bar' => 'baz' } },
             { 'fixture4' => [ 'boo', 'bork' ] }
         ],
-        'EXPECTED'     => 'Some output',
+        'EXPECTED'     => "Some output\n",
     };
     is_deeply($file->data, [$test1], q{YAML data returned correctly});
     isa_ok($file->cases->[0], 'Test::Story::TestCase', q{cases() returned a Test::Story::TestCase object});
