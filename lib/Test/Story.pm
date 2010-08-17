@@ -320,6 +320,10 @@ L<Test::Story::File> class.
 
 L<Test::Story::File>, L<Test::FITesque>
 
+=head1 SOURCE CONTROL
+
+http://github.com/NachoMan/Test-Story
+
 =head1 AUTHORS
 
 Michael Nachbaur E<lt>mike@nachbaur.comE<gt>,
